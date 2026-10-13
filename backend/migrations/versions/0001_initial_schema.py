@@ -2,7 +2,7 @@
 
 Revision ID: 0001
 Revises: 
-Create Date: 2026-10-13 21:46:19.225558
+Create Date: 2026-10-13 21:55:48.633001
 """
 
 from collections.abc import Sequence
@@ -44,9 +44,9 @@ def upgrade() -> None:
     sa.Column('name', sqlmodel.sql.sqltypes.AutoString(length=200), nullable=False),
     sa.Column('desired_retention', sa.Float(), nullable=False),
     sa.Column('maximum_interval', sa.Integer(), nullable=False),
-    sa.Column('fsrs_weights', sa.JSON(), nullable=True),
-    sa.Column('learning_steps', sa.JSON(), nullable=False),
-    sa.Column('relearning_steps', sa.JSON(), nullable=False),
+    sa.Column('fsrs_weights', sa.JSON(none_as_null=True), nullable=True),
+    sa.Column('learning_steps', sa.JSON(none_as_null=True), nullable=False),
+    sa.Column('relearning_steps', sa.JSON(none_as_null=True), nullable=False),
     sa.Column('enable_fuzz', sa.Boolean(), nullable=False),
     sa.Column('new_per_day', sa.Integer(), nullable=False),
     sa.Column('reviews_per_day', sa.Integer(), nullable=False),
@@ -56,7 +56,7 @@ def upgrade() -> None:
     sa.Column('bury_interday_learning', sa.Boolean(), nullable=False),
     sa.Column('autoplay_audio', sa.Boolean(), nullable=False),
     sa.Column('show_answer_timer', sa.Integer(), nullable=False),
-    sa.Column('anki_raw', sa.JSON(), nullable=True),
+    sa.Column('anki_raw', sa.JSON(none_as_null=True), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
@@ -73,7 +73,7 @@ def upgrade() -> None:
     sa.Column('stage', sqlmodel.sql.sqltypes.AutoString(length=64), nullable=False),
     sa.Column('progress', sa.Float(), nullable=False),
     sa.Column('message', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
-    sa.Column('stats', sa.JSON(), nullable=False),
+    sa.Column('stats', sa.JSON(none_as_null=True), nullable=False),
     sa.Column('created_at', kuru.db.types.UTCDateTime(), nullable=False),
     sa.Column('finished_at', kuru.db.types.UTCDateTime(), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ondelete='CASCADE'),
@@ -108,10 +108,10 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sqlmodel.sql.sqltypes.AutoString(length=500), nullable=False),
     sa.Column('kind', sa.Integer(), nullable=False),
-    sa.Column('fields', sa.JSON(), nullable=False),
-    sa.Column('templates', sa.JSON(), nullable=False),
+    sa.Column('fields', sa.JSON(none_as_null=True), nullable=False),
+    sa.Column('templates', sa.JSON(none_as_null=True), nullable=False),
     sa.Column('css', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-    sa.Column('anki_raw', sa.JSON(), nullable=True),
+    sa.Column('anki_raw', sa.JSON(none_as_null=True), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
@@ -131,7 +131,7 @@ def upgrade() -> None:
     sa.Column('description', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('config_id', sa.Integer(), nullable=True),
     sa.Column('is_filtered', sa.Boolean(), nullable=False),
-    sa.Column('anki_raw', sa.JSON(), nullable=True),
+    sa.Column('anki_raw', sa.JSON(none_as_null=True), nullable=True),
     sa.ForeignKeyConstraint(['config_id'], ['deck_config.id'], ondelete='SET NULL'),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
@@ -151,8 +151,8 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('guid', sqlmodel.sql.sqltypes.AutoString(length=64), nullable=False),
     sa.Column('note_type_id', sa.Integer(), nullable=False),
-    sa.Column('fields', sa.JSON(), nullable=False),
-    sa.Column('tags', sa.JSON(), nullable=False),
+    sa.Column('fields', sa.JSON(none_as_null=True), nullable=False),
+    sa.Column('tags', sa.JSON(none_as_null=True), nullable=False),
     sa.Column('sort_field', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.ForeignKeyConstraint(['note_type_id'], ['note_type.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ondelete='CASCADE'),
@@ -207,7 +207,7 @@ def upgrade() -> None:
     sa.Column('anki_mod', sa.BigInteger(), nullable=True),
     sa.Column('anki_usn', sa.Integer(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=False),
-    sa.Column('id', sqlmodel.sql.sqltypes.AutoString(length=36), nullable=False),
+    sa.Column('id', sqlmodel.sql.sqltypes.AutoString(length=64), nullable=False),
     sa.Column('anki_card_id', sa.BigInteger(), nullable=True),
     sa.Column('card_id', sa.Integer(), nullable=False),
     sa.Column('rating', sa.Integer(), nullable=False),
@@ -217,7 +217,7 @@ def upgrade() -> None:
     sa.Column('interval', sa.Integer(), nullable=True),
     sa.Column('last_interval', sa.Integer(), nullable=True),
     sa.Column('factor', sa.Integer(), nullable=True),
-    sa.Column('memory_before', sa.JSON(), nullable=True),
+    sa.Column('memory_before', sa.JSON(none_as_null=True), nullable=True),
     sa.ForeignKeyConstraint(['card_id'], ['card.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')

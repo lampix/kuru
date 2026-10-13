@@ -34,7 +34,7 @@ class ReviewLog(OwnedModel, AnkiIdentity, table=True):
     __tablename__ = "review_log"
     __table_args__ = (Index("ix_review_card_time", "card_id", "reviewed_at"),)
 
-    id: str = Field(default_factory=lambda: str(uuid4()), primary_key=True, max_length=36)
+    id: str = Field(default_factory=lambda: str(uuid4()), primary_key=True, max_length=64)
     anki_card_id: int | None = Field(default=None, sa_type=BigInteger)
     card_id: int = Field(foreign_key="card.id", index=True, ondelete="CASCADE")
     rating: int = Field(ge=0, le=4)

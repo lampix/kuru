@@ -19,7 +19,7 @@ def utc_field(**kwargs: Any) -> Any:
 
 def json_field(**kwargs: Any) -> Any:
     """A JSON column."""
-    return Field(sa_type=JSON, **kwargs)
+    return Field(sa_type=JSON(none_as_null=True), **kwargs)
 
 
 def int_enum_field(**kwargs: Any) -> Any:
