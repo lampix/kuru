@@ -2,7 +2,7 @@
 
 Revision ID: 0001
 Revises: 
-Create Date: 2026-10-13 21:43:01.257485
+Create Date: 2026-10-13 21:46:19.225558
 """
 
 from collections.abc import Sequence
@@ -217,6 +217,7 @@ def upgrade() -> None:
     sa.Column('interval', sa.Integer(), nullable=True),
     sa.Column('last_interval', sa.Integer(), nullable=True),
     sa.Column('factor', sa.Integer(), nullable=True),
+    sa.Column('memory_before', sa.JSON(), nullable=True),
     sa.ForeignKeyConstraint(['card_id'], ['card.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')

@@ -4,12 +4,13 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import IntEnum
+from typing import Any
 from uuid import uuid4
 
 from sqlalchemy import BigInteger, Index
 from sqlmodel import Field
 
-from kuru.models.base import AnkiIdentity, OwnedModel, int_enum_field, utc_field
+from kuru.models.base import AnkiIdentity, OwnedModel, int_enum_field, json_field, utc_field
 
 
 class ReviewKind(IntEnum):
@@ -45,3 +46,7 @@ class ReviewLog(OwnedModel, AnkiIdentity, table=True):
     interval: int | None = Field(default=None, description="Anki ivl: days (>0) or -seconds (<0).")
     last_interval: int | None = None
     factor: int | None = None
+
+    # Card state immediately before this review (set for reviews made in Kuru). Enables exact undo
+    # and merging out-of-order offline reviews without replaying imported Anki history.
+    memory_before: dict[str, Any] | None = json_field(default=None)
