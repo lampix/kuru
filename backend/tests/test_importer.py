@@ -79,7 +79,7 @@ def test_import_structure(session: Session, user: User, settings: Settings, pack
     assert preset.new_per_day == 15
     assert preset.reviews_per_day == 150
     assert preset.maximum_interval == 3650
-    assert preset.desired_retention == pytest.approx(0.85)
+    assert preset.desired_retention == 0.85  # float32 artefacts are rounded away
     assert preset.learning_steps == [1.0, 10.0]
     assert preset.bury_new is True
     assert preset.autoplay_audio is False

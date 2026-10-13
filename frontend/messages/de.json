@@ -194,7 +194,8 @@
     "showAnswerTimer": "Antwort zeigen nach",
     "saved": "Gespeichert",
     "deletePreset": "Voreinstellung löschen",
-    "onlineOnly": "Zum Ändern der Optionen ist eine Verbindung zum Server nötig."
+    "onlineOnly": "Zum Ändern der Optionen ist eine Verbindung zum Server nötig.",
+    "daysUnit": "Tage"
   },
   "login": {
     "title": "Anmelden",

@@ -180,15 +180,16 @@ class CollectionReader:
         presets = []
         for row in self._db.execute("SELECT id, name, mtime_secs, usn, config FROM deck_config"):
             cfg = Message.parse(row["config"])
-            weights = cfg.f32s(6) or cfg.f32s(5) or cfg.f32s(3)
+            # Protobuf floats are 32-bit; round away artefacts such as 0.8500000238.
+            weights = [round(w, 4) for w in (cfg.f32s(6) or cfg.f32s(5) or cfg.f32s(3))]
             presets.append(
                 AnkiPreset(
                     id=row["id"],
                     name=row["name"],
                     mod=row["mtime_secs"],
                     usn=row["usn"],
-                    learn_steps=cfg.f32s(1),
-                    relearn_steps=cfg.f32s(2),
+                    learn_steps=[round(step, 3) for step in cfg.f32s(1)],
+                    relearn_steps=[round(step, 3) for step in cfg.f32s(2)],
                     new_per_day=cfg.varint(9),
                     reviews_per_day=cfg.varint(10),
                     maximum_interval=cfg.varint(16) or 36500,
@@ -197,8 +198,8 @@ class CollectionReader:
                     bury_new=cfg.flag(27),
                     bury_reviews=cfg.flag(28),
                     bury_interday_learning=cfg.flag(29),
-                    desired_retention=cfg.f32(37) or 0.9,
-                    seconds_to_show_answer=cfg.f32(42),
+                    desired_retention=round(cfg.f32(37), 4) or 0.9,
+                    seconds_to_show_answer=round(cfg.f32(42), 1),
                     fsrs_weights=weights,
                     raw={"format": "protobuf", "config_hex": bytes(row["config"]).hex()},
                 )

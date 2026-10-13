@@ -194,7 +194,8 @@
     "showAnswerTimer": "Show answer after",
     "saved": "Saved",
     "deletePreset": "Delete Preset",
-    "onlineOnly": "Changing options requires a connection to the server."
+    "onlineOnly": "Changing options requires a connection to the server.",
+    "daysUnit": "days"
   },
   "login": {
     "title": "Sign In",
