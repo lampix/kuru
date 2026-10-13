@@ -1,6 +1,5 @@
 "use client";
 
-import { useLocale } from "next-intl";
 import { type ReactNode, useEffect } from "react";
 
 import { usePathname, useRouter } from "@/i18n/navigation";
@@ -43,7 +42,6 @@ function adoptDeviceTimezone() {
 
 /** Client-side app services: service worker, background sync and auth redirects. */
 export function AppProviders({ children }: { children: ReactNode }) {
-  const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
   const { phase } = useSyncStatus();
@@ -53,11 +51,6 @@ export function AppProviders({ children }: { children: ReactNode }) {
     adoptDeviceTimezone();
     return startSyncManager();
   }, []);
-
-  useEffect(() => {
-    // The service worker reads this to redirect `/` to the right locale while offline.
-    void setMeta(META.locale, locale);
-  }, [locale]);
 
   useEffect(() => {
     if (phase === "unauthorized" && pathname !== "/login") router.replace("/login");

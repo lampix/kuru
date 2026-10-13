@@ -28,7 +28,7 @@ src/
     ui/                  shadcn/ui primitives restyled with iOS tokens
   i18n/                  next-intl routing, request config and locale detection
   lib/fsrs/              client-side FSRS-6 scheduler (ts-fsrs) + deterministic fuzz shared with the server
-  proxy.ts               redirects locale-less URLs using override cookie → Accept-Language → English
+  app/(root)/page.tsx    `/`: picks the locale on the client (override cookie → system languages → English)
 messages/{en,de}.json    UI strings
 ```
 

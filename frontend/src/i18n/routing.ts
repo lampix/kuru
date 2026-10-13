@@ -10,7 +10,7 @@ export const routing = defineRouting({
   locales,
   defaultLocale: "en",
   localePrefix: "always",
-  // Detection is implemented in `src/proxy.ts` to follow Kuru's override → system → English cascade.
+  // Detection happens on `/` (app/(root)/page.tsx): override cookie → system languages → English.
   localeDetection: false,
   localeCookie: false,
 });

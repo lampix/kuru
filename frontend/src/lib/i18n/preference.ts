@@ -21,8 +21,8 @@ export function getLanguagePreference(): LanguagePreference {
 }
 
 /**
- * Persist the preference and return the locale to switch to. The cookie is read by `proxy.ts`
- * when a locale-less URL is opened; "system" removes it so the browser language applies again.
+ * Persist the preference and return the locale to switch to. The cookie is read by the `/` page
+ * when the app starts; "system" removes it so the browser language applies again.
  */
 export function setLanguagePreference(preference: LanguagePreference): AppLocale {
   try {

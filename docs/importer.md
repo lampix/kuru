@@ -5,8 +5,13 @@ version, preserving scheduling state and the full review history.
 
 ## Flow
 
-1. `POST /api/import` streams the upload into `data/uploads/` (size-limited by `KURU_MAX_UPLOAD_MB`),
-   creates an `import_job` row and returns `202 Accepted` with the job.
+1. The browser uploads in **resumable 5 MB chunks**: `POST /api/import/uploads` announces the file,
+   `PUT /api/import/uploads/{id}?offset=…` appends chunks (re-sent chunks are ignored, a wrong
+   offset returns `409` with the expected position via `GET /api/import/uploads/{id}`), and
+   `POST /api/import/uploads/{id}/complete` starts the import. Chunking keeps every request below
+   the 10 MB body limit of the Next.js rewrite and of typical reverse proxies.
+   Scripts can instead send the whole file to `POST /api/import` (multipart, streamed to disk).
+   Both are size-limited by `KURU_MAX_UPLOAD_MB` and return the `import_job` to poll.
 2. A FastAPI background task runs `run_import_job` (`services/importer/jobs.py`).
 3. Clients poll `GET /api/import/status/{job_id}` for `stage` and `progress` (0–1).
 

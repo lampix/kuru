@@ -4,7 +4,7 @@
  *
  * - precaches the app shell: hashed Next.js assets and the prerendered pages of every locale
  * - serves media from the cache filled by the sync engine (`kuru-media-v1`)
- * - falls back to cached pages when offline; `/` redirects to the last used locale
+ * - falls back to cached pages when offline (`/` is precached and picks the locale itself)
  * - flushes the review outbox via Background Sync where supported
  */
 
@@ -19,7 +19,7 @@ import {
   StaleWhileRevalidate,
 } from "serwist";
 
-import { META, db, getMeta } from "@/lib/db";
+import { db } from "@/lib/db";
 import { MEDIA_CACHE } from "@/lib/sync/media";
 import { flushOutbox } from "@/lib/sync/outbox";
 
@@ -31,7 +31,6 @@ declare global {
 
 declare const self: ServiceWorkerGlobalScope & WorkerGlobalScope;
 
-const LOCALES = ["en", "de"];
 export const OUTBOX_SYNC_TAG = "kuru-outbox";
 
 const isRsc = (request: Request) =>
@@ -48,23 +47,6 @@ const serwist = new Serwist({
   navigationPreload: true,
   disableDevLogs: true,
   runtimeCaching: [
-    {
-      // Offline: `/` (the manifest's start_url) → `/<locale>` using the stored preference.
-      matcher: ({ request, url, sameOrigin }) =>
-        sameOrigin &&
-        request.mode === "navigate" &&
-        !LOCALES.includes(url.pathname.split("/")[1] ?? ""),
-      handler: async ({ request, url }) => {
-        try {
-          return await fetch(request);
-        } catch {
-          const stored = await getMeta<string>(META.locale).catch(() => undefined);
-          const fromNavigator = self.navigator.language.slice(0, 2).toLowerCase();
-          const locale = stored ?? (LOCALES.includes(fromNavigator) ? fromNavigator : "en");
-          return Response.redirect(`/${locale}${url.pathname === "/" ? "" : url.pathname}`, 302);
-        }
-      },
-    },
     {
       matcher: ({ url, sameOrigin }) => sameOrigin && url.pathname.startsWith("/api/media/"),
       handler: new CacheFirst({

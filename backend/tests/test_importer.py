@@ -194,3 +194,26 @@ def test_upload_rejects_wrong_type_and_bad_archives(client: TestClient) -> None:
     job = client.get(f"/api/import/status/{response.json()['id']}").json()
     assert job["status"] == "failed"
     assert "valid" in job["message"]
+
+
+def test_chunked_upload(client: TestClient, tmp_path: Path) -> None:
+    data = fx.build_package(tmp_path / "chunked.apkg", latest=False).read_bytes()
+    state = client.post("/api/import/uploads", json={"filename": "chunked.apkg", "size": len(data)})
+    assert state.status_code == 201
+    job_id = state.json()["job_id"]
+    half = len(data) // 2
+    url = f"/api/import/uploads/{job_id}"
+    assert client.put(url, params={"offset": 0}, content=data[:half]).json()["received"] == half
+    # Re-sent chunk is ignored, a gap is rejected.
+    assert client.put(url, params={"offset": 0}, content=data[:half]).json()["received"] == half
+    assert client.put(url, params={"offset": half + 1}, content=data[half:]).status_code == 409
+    assert client.post(f"{url}/complete").status_code == 409  # incomplete
+    client.put(url, params={"offset": half}, content=data[half:])
+    assert client.get(url).json()["received"] == len(data)
+    job = client.post(f"{url}/complete").json()
+    status = client.get(f"/api/import/status/{job['id']}").json()
+    assert status["status"] == "completed"
+    assert client.put(url, params={"offset": 0}, content=b"x").status_code == 409
+    assert (
+        client.post("/api/import/uploads", json={"filename": "x.txt", "size": 1}).status_code == 415
+    )

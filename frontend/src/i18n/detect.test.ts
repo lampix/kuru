@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import de from "../../messages/de.json";
 import en from "../../messages/en.json";
-import { parseAcceptLanguage, resolveLocale } from "./detect";
+import { resolveLocale } from "./detect";
 
 describe("resolveLocale", () => {
   it("prefers the manual override", () => {
@@ -15,13 +15,6 @@ describe("resolveLocale", () => {
   it("falls back to English for unsupported languages", () => {
     expect(resolveLocale(null, ["fr-FR", "ja"])).toBe("en");
     expect(resolveLocale("xx", [])).toBe("en");
-  });
-});
-
-describe("parseAcceptLanguage", () => {
-  it("orders by quality", () => {
-    expect(parseAcceptLanguage("fr;q=0.4, de-DE;q=0.9, en")).toEqual(["en", "de-DE", "fr"]);
-    expect(parseAcceptLanguage(null)).toEqual([]);
   });
 });
 
