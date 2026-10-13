@@ -1,0 +1,198 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/*
+ * Kuru design tokens — Apple Human Interface Guidelines system colours.
+ * https://developer.apple.com/design/human-interface-guidelines/color
+ *
+ * Dark mode follows the operating system. shadcn/ui tokens are mapped onto the iOS palette so the
+ * generated primitives (dialog, sheet, switch, …) blend in.
+ */
+@custom-variant dark (@media (prefers-color-scheme: dark));
+
+:root {
+  color-scheme: light dark;
+
+  /* Backgrounds */
+  --ios-bg: #ffffff;
+  --ios-grouped-bg: #f2f2f7;
+  --ios-grouped-bg-2: #ffffff;
+  --ios-grouped-bg-3: #f2f2f7;
+
+  /* Labels */
+  --ios-label: #000000;
+  --ios-label-2: rgb(60 60 67 / 0.6);
+  --ios-label-3: rgb(60 60 67 / 0.3);
+  --ios-label-4: rgb(60 60 67 / 0.18);
+
+  /* Fills and separators */
+  --ios-fill: rgb(120 120 128 / 0.2);
+  --ios-fill-2: rgb(120 120 128 / 0.16);
+  --ios-fill-3: rgb(118 118 128 / 0.12);
+  --ios-separator: rgb(60 60 67 / 0.29);
+  --ios-bar: rgb(249 249 249 / 0.94);
+
+  /* Tints */
+  --ios-blue: #007aff;
+  --ios-red: #ff3b30;
+  --ios-orange: #ff9500;
+  --ios-green: #34c759;
+  --ios-yellow: #ffcc00;
+  --ios-indigo: #5856d6;
+  --ios-teal: #30b0c7;
+  --ios-gray: #8e8e93;
+
+  /* shadcn/ui mapping */
+  --background: var(--ios-grouped-bg);
+  --foreground: var(--ios-label);
+  --card: var(--ios-grouped-bg-2);
+  --card-foreground: var(--ios-label);
+  --popover: var(--ios-grouped-bg-2);
+  --popover-foreground: var(--ios-label);
+  --primary: var(--ios-blue);
+  --primary-foreground: #ffffff;
+  --secondary: var(--ios-fill-3);
+  --secondary-foreground: var(--ios-blue);
+  --muted: var(--ios-fill-3);
+  --muted-foreground: var(--ios-label-2);
+  --accent: var(--ios-fill-3);
+  --accent-foreground: var(--ios-label);
+  --destructive: var(--ios-red);
+  --border: var(--ios-separator);
+  --input: var(--ios-fill);
+  --ring: var(--ios-blue);
+  --radius: 0.625rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ios-bg: #000000;
+    --ios-grouped-bg: #000000;
+    --ios-grouped-bg-2: #1c1c1e;
+    --ios-grouped-bg-3: #2c2c2e;
+
+    --ios-label: #ffffff;
+    --ios-label-2: rgb(235 235 245 / 0.6);
+    --ios-label-3: rgb(235 235 245 / 0.3);
+    --ios-label-4: rgb(235 235 245 / 0.16);
+
+    --ios-fill: rgb(120 120 128 / 0.36);
+    --ios-fill-2: rgb(120 120 128 / 0.32);
+    --ios-fill-3: rgb(118 118 128 / 0.24);
+    --ios-separator: rgb(84 84 88 / 0.65);
+    --ios-bar: rgb(22 22 23 / 0.94);
+
+    --ios-blue: #0a84ff;
+    --ios-red: #ff453a;
+    --ios-orange: #ff9f0a;
+    --ios-green: #30d158;
+    --ios-yellow: #ffd60a;
+    --ios-indigo: #5e5ce6;
+    --ios-teal: #40c8e0;
+    --ios-gray: #8e8e93;
+  }
+}
+
+@theme inline {
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, "Hiragino Sans", "Noto Sans JP", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+
+  --color-ios-bg: var(--ios-bg);
+  --color-grouped: var(--ios-grouped-bg);
+  --color-grouped-2: var(--ios-grouped-bg-2);
+  --color-grouped-3: var(--ios-grouped-bg-3);
+  --color-label: var(--ios-label);
+  --color-label-2: var(--ios-label-2);
+  --color-label-3: var(--ios-label-3);
+  --color-label-4: var(--ios-label-4);
+  --color-fill: var(--ios-fill);
+  --color-fill-2: var(--ios-fill-2);
+  --color-fill-3: var(--ios-fill-3);
+  --color-separator: var(--ios-separator);
+  --color-bar: var(--ios-bar);
+  --color-tint: var(--ios-blue);
+  --color-ios-blue: var(--ios-blue);
+  --color-ios-red: var(--ios-red);
+  --color-ios-orange: var(--ios-orange);
+  --color-ios-green: var(--ios-green);
+  --color-ios-yellow: var(--ios-yellow);
+  --color-ios-indigo: var(--ios-indigo);
+  --color-ios-teal: var(--ios-teal);
+  --color-ios-gray: var(--ios-gray);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+
+  /* iOS Dynamic Type (large size category) */
+  --text-large-title: 2.125rem;
+  --text-large-title--line-height: 2.563rem;
+  --text-large-title--letter-spacing: 0.0234em;
+  --text-title-1: 1.75rem;
+  --text-title-2: 1.375rem;
+  --text-title-3: 1.25rem;
+  --text-headline: 1.0625rem;
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.375rem;
+  --text-callout: 1rem;
+  --text-subhead: 0.9375rem;
+  --text-footnote: 0.8125rem;
+  --text-caption: 0.75rem;
+  --text-caption-2: 0.6875rem;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-grouped text-body text-label antialiased;
+    overscroll-behavior-y: none;
+  }
+}
+
+@utility pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+@utility glass {
+  background-color: var(--ios-bar);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+@utility hairline-b {
+  box-shadow: inset 0 -0.5px 0 var(--ios-separator);
+}
+@utility hairline-t {
+  box-shadow: inset 0 0.5px 0 var(--ios-separator);
+}
