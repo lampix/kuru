@@ -1,0 +1,74 @@
+[project]
+name = "kuru"
+version = "0.1.0"
+description = "Kuru backend — FastAPI service for an Anki-compatible, FSRS-powered spaced repetition PWA."
+readme = "README.md"
+license = "MIT"
+authors = [{ name = "The Kuru contributors" }]
+requires-python = ">=3.13"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Framework :: FastAPI",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Education",
+]
+dependencies = [
+    "alembic>=1.20.0",
+    "fastapi>=0.143.0",
+    "fsrs>=6.3.2",
+    "protobuf>=7.36.2",
+    "pydantic-settings>=2.15.0",
+    "python-multipart>=0.0.32",
+    "sqlmodel>=0.0.48",
+    "uvicorn[standard]>=0.54.0",
+    "zstandard>=0.25.0",
+]
+
+[project.optional-dependencies]
+# The FSRS optimizer pulls in PyTorch; it is only needed for parameter auto-tuning.
+optimizer = ["fsrs[optimizer]>=6.3.2"]
+
+[project.scripts]
+kuru = "kuru.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.13.0,<0.14.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "httpx2>=2.13.1",
+    "mypy>=2.4.0",
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.17.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+extend-exclude = ["migrations/versions"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "A", "C4", "SIM", "RUF", "PTH", "DTZ", "FAST", "S"]
+ignore = ["S101"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S", "DTZ"]
+
+[tool.mypy]
+strict = true
+python_version = "3.13"
+files = ["src", "tests"]
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["fsrs.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+filterwarnings = ["error::DeprecationWarning:kuru.*"]
