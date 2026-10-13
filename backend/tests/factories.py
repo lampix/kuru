@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+from datetime import datetime, timedelta
 from uuid import uuid4
 
 from sqlmodel import Session, select
 
-from kuru.models import Card, Deck, Note, NoteType, User
+from kuru.models import Card, CardState, Deck, Note, NoteType, User
 
 
 def get_or_create_deck(session: Session, user: User, name: str = "Default") -> Deck:
@@ -45,3 +46,29 @@ def make_card(
     session.commit()
     session.refresh(card)
     return card
+
+
+def make_review_card(
+    session: Session, user: User, *, due: datetime, deck_name: str = "Default"
+) -> Card:
+    """A card in the review state, due at ``due``."""
+    card = make_card(session, user, deck_name=deck_name)
+    card.state = CardState.REVIEW
+    card.stability, card.difficulty = 10.0, 5.0
+    card.due = due
+    card.last_review = due - timedelta(days=10)
+    card.reps = 3
+    session.add(card)
+    session.commit()
+    session.refresh(card)
+    return card
+
+
+def add_sibling(session: Session, user: User, card: Card) -> Card:
+    """Another card of the same note."""
+    assert user.id is not None
+    sibling = Card(user_id=user.id, note_id=card.note_id, deck_id=card.deck_id, ord=card.ord + 1)
+    session.add(sibling)
+    session.commit()
+    session.refresh(sibling)
+    return sibling

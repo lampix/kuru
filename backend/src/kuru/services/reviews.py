@@ -144,6 +144,10 @@ def _rebuild(
 
     for log in suffix:
         if log.rating == 0:
+            if log.kind in (ReviewKind.MANUAL, ReviewKind.RESCHEDULED) and not log.interval:
+                log.memory_before = memory.to_dict()
+                session.add(log)
+                memory = MemoryState(card_id=card.id, reps=memory.reps)
             continue
         log.memory_before = memory.to_dict()
         after = engine.review(memory, log.rating, log.reviewed_at)
