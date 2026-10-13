@@ -1,0 +1,50 @@
+# OS / editors
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+.turbo/
+*.tsbuildinfo
+next-env.d.ts
+.pnpm-store/
+
+# Serwist generated service worker
+frontend/public/sw.js
+frontend/public/sw.js.map
+frontend/public/swe-worker-*.js
+
+# Runtime data
+data/
+*.sqlite
+*.sqlite3
+*.db
+*.apkg
+*.colpkg
+
+# Env
+.env
+.env.*
+!.env.example
+
+# Playwright
+test-results/
+playwright-report/
