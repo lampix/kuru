@@ -12,8 +12,8 @@ pnpm lint && pnpm typecheck && pnpm format:check
 pnpm build        # production build
 ```
 
-| Variable | Default | Description |
-| --- | --- | --- |
+| Variable       | Default                 | Description                                                   |
+| -------------- | ----------------------- | ------------------------------------------------------------- |
 | `KURU_API_URL` | `http://127.0.0.1:8000` | Backend origin that `/api/*` is rewritten to (**build time**) |
 
 ## Architecture
@@ -32,10 +32,10 @@ src/
 messages/{en,de}.json    UI strings
 ```
 
-* **Cache Components** are enabled. Every page is prerendered per locale (`/en`, `/de`), which keeps
+- **Cache Components** are enabled. Every page is prerendered per locale (`/en`, `/de`), which keeps
   the app shell cacheable by the service worker. Data comes from IndexedDB in client components, and
   dynamic ids are passed as search parameters (e.g. `/en/study?deck=12`).
-* The locale lives in the URL and is read with `next/root-params`; the root layout is
+- The locale lives in the URL and is read with `next/root-params`; the root layout is
   `app/[locale]/layout.tsx`.
-* `/api/*` is rewritten to the backend, so the browser talks to a single origin (cookies, no CORS).
+- `/api/*` is rewritten to the backend, so the browser talks to a single origin (cookies, no CORS).
   The proxy matcher excludes `/api` so uploads stream without buffering.

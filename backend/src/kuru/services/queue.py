@@ -94,7 +94,8 @@ def subtree_ids(decks: Iterable[Deck], root: Deck) -> list[int]:
     ]
 
 
-def _is_new_card_review(log: ReviewLog) -> bool:
+def is_new_card_review(log: ReviewLog) -> bool:
+    """Whether ``log`` introduced a new card (counts towards the new-card limit)."""
     if log.memory_before is not None:
         return bool(log.memory_before.get("state") == CardState.NEW)
     # Imported Anki entry: the first learning step of a new card has no previous interval.
@@ -118,7 +119,7 @@ def studied_today(
     )
     for log, note_id in rows:
         result.notes.add(note_id)
-        if _is_new_card_review(log):
+        if is_new_card_review(log):
             result.new_cards.add(log.card_id)
         elif log.kind == ReviewKind.REVIEW:
             result.reviews += 1

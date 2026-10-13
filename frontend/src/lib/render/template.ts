@@ -25,7 +25,8 @@ export function parseTemplate(template: string): Node[] {
   const target = () => (stack.length ? stack[stack.length - 1]!.children : root);
   let last = 0;
   for (const match of template.matchAll(TAG)) {
-    if (match.index > last) target().push({ kind: "text", value: template.slice(last, match.index) });
+    if (match.index > last)
+      target().push({ kind: "text", value: template.slice(last, match.index) });
     last = match.index + match[0].length;
     const body = match[1]!.trim();
     if (!body || body.startsWith("!")) continue;

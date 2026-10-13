@@ -75,3 +75,15 @@ def test_media_manifest_and_download(client: TestClient, tmp_path: Path) -> None
     cached = client.get("/api/media/sound.mp3", headers={"If-None-Match": etag})
     assert cached.status_code == 304
     assert client.get("/api/media/missing.png").status_code == 404
+
+
+def test_recent_reviews(client: TestClient, session: Session, user: User) -> None:
+    card = make_card(session, user)
+    assert card.id is not None
+    client.post(
+        "/api/sync/reviews", json={"reviews": [_review(card.id, 3, 5), _review(card.id, 3, 1)]}
+    )
+    since = (utcnow() - timedelta(hours=1)).isoformat()
+    reviews = client.get("/api/sync/reviews", params={"since": since}).json()
+    assert [r["was_new"] for r in reviews] == [True, False]
+    assert reviews[0]["kind"] == 0

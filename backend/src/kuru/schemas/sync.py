@@ -68,3 +68,15 @@ class MediaEntryOut(BaseModel):
     size: int
     mime_type: str
     updated_at: datetime
+
+
+class RecentReview(BaseModel):
+    """A review as needed by clients to apply daily limits offline."""
+
+    id: str
+    card_id: int
+    rating: int
+    reviewed_at: datetime
+    kind: int
+    was_new: bool
+    duration_ms: int | None

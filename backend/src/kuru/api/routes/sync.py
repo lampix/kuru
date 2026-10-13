@@ -23,18 +23,20 @@ from sqlmodel import col, func, or_, select
 from kuru.api.deps import CurrentUser, SessionDep
 from kuru.api.serializers import note_type_out, preset_out, study_cards
 from kuru.core.time import utcnow
-from kuru.models import Card, Deck, DeckConfig, MediaFile, Note, NoteType
+from kuru.models import Card, Deck, DeckConfig, MediaFile, Note, NoteType, ReviewLog
 from kuru.schemas.scheduling import CardMemory
 from kuru.schemas.sync import (
     CardIds,
     CardPage,
     MediaEntryOut,
+    RecentReview,
     ReviewBatch,
     ReviewBatchResult,
     SyncDeck,
     SyncMeta,
 )
 from kuru.services.presets import default_preset
+from kuru.services.queue import is_new_card_review
 from kuru.services.reviews import ReviewSubmission, record_reviews
 
 router = APIRouter(prefix="/sync", tags=["sync"])
@@ -151,3 +153,35 @@ def media_manifest(
     if since is not None:
         query = query.where(col(MediaFile.updated_at) > since)
     return [MediaEntryOut.model_validate(m, from_attributes=True) for m in session.exec(query)]
+
+
+@router.get("/reviews")
+def recent_reviews(
+    session: SessionDep,
+    user: CurrentUser,
+    since: AwareDatetime,
+    limit: Annotated[int, Query(ge=1, le=20000)] = 5000,
+) -> list[RecentReview]:
+    """Rated reviews after ``since`` (clients request the current and previous study day)."""
+    logs = session.exec(
+        select(ReviewLog)
+        .where(
+            ReviewLog.user_id == user.id,
+            col(ReviewLog.reviewed_at) > since,
+            col(ReviewLog.rating) > 0,
+        )
+        .order_by(col(ReviewLog.reviewed_at))
+        .limit(limit)
+    )
+    return [
+        RecentReview(
+            id=log.id,
+            card_id=log.card_id,
+            rating=log.rating,
+            reviewed_at=log.reviewed_at,
+            kind=int(log.kind),
+            was_new=is_new_card_review(log),
+            duration_ms=log.duration_ms,
+        )
+        for log in logs
+    ]

@@ -49,7 +49,9 @@ const FRONT_MARKER = "\u0000kuru-frontside\u0000";
 
 function context(noteType: NoteTypeLike, card: CardLike, side: CardSide, deckName: string) {
   const isCloze = noteType.kind === 1;
-  const template = isCloze ? noteType.templates[0] : noteType.templates.find((t) => t.ord === card.ord);
+  const template = isCloze
+    ? noteType.templates[0]
+    : noteType.templates.find((t) => t.ord === card.ord);
   const fields: Record<string, string> = {};
   [...noteType.fields]
     .sort((a, b) => a.ord - b.ord)
@@ -97,7 +99,10 @@ export function renderCard(
       return renderTemplate(template, ctx, front);
     } catch (error) {
       if (!(error instanceof TemplateError)) throw error;
-      return { html: `<div class="kuru-template-error">${error.message}</div>`, expectedAnswer: null };
+      return {
+        html: `<div class="kuru-template-error">${error.message}</div>`,
+        expectedAnswer: null,
+      };
     }
   };
 
@@ -113,7 +118,10 @@ export function renderCard(
   answerHtml = replaceSoundTags(answerHtml, label);
   const expected = answer.expectedAnswer ?? question.expectedAnswer;
   if (expected !== null) {
-    answerHtml = answerHtml.replace(TYPE_ANSWER_MARKER, compareAnswer(expected, options.typedAnswer ?? ""));
+    answerHtml = answerHtml.replace(
+      TYPE_ANSWER_MARKER,
+      compareAnswer(expected, options.typedAnswer ?? ""),
+    );
   }
   // The answer's FrontSide shows the question without the type-answer input.
   const frontForAnswer = questionRendered.replace(/<input[^>]*id="typeans"[^>]*>/, "");

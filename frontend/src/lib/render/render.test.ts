@@ -35,11 +35,16 @@ const cloze: NoteTypeLike = {
     { name: "Text", ord: 0 },
     { name: "Extra", ord: 1 },
   ],
-  templates: [{ name: "Cloze", ord: 0, qfmt: "{{cloze:Text}}", afmt: "{{cloze:Text}}<br>{{Extra}}" }],
+  templates: [
+    { name: "Cloze", ord: 0, qfmt: "{{cloze:Text}}", afmt: "{{cloze:Text}}<br>{{Extra}}" },
+  ],
   css: "",
 };
 
-const ctx = (fields: Record<string, string>, extra: Partial<RenderContext> = {}): RenderContext => ({
+const ctx = (
+  fields: Record<string, string>,
+  extra: Partial<RenderContext> = {},
+): RenderContext => ({
   side: "question",
   fields,
   tags: ["jp", "n5"],
@@ -165,7 +170,9 @@ describe("renderCard", () => {
   it("compares typed answers", () => {
     const typing: NoteTypeLike = {
       ...basic,
-      templates: [{ name: "T", ord: 0, qfmt: "{{Front}} {{type:Back}}", afmt: "{{Front}}<hr>{{type:Back}}" }],
+      templates: [
+        { name: "T", ord: 0, qfmt: "{{Front}} {{type:Back}}", afmt: "{{Front}}<hr>{{type:Back}}" },
+      ],
     };
     const card = { ord: 0, fields: ["Hund", "dog"], tags: [] };
     const front = renderCard(typing, card);
@@ -191,7 +198,8 @@ describe("plugins", () => {
         name: "test",
         filters: { shout: (text) => text.toUpperCase() },
         beforeRender: (c) => ({ ...c, fields: { ...c.fields, Front: `${c.fields.Front}!` } }),
-        afterRender: (html, c) => (c.side === "question" ? `<div class="wrapped">${html}</div>` : html),
+        afterRender: (html, c) =>
+          c.side === "question" ? `<div class="wrapped">${html}</div>` : html,
       }),
     );
     const noteType = { ...basic, templates: [{ ...basic.templates[0]!, qfmt: "{{shout:Front}}" }] };

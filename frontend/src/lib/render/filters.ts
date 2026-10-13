@@ -13,9 +13,13 @@ const furigana: TemplateFilter = (text) =>
     reading.startsWith("sound:") ? _m : `<ruby><rb>${base}</rb><rt>${reading}</rt></ruby>`,
   );
 const kana: TemplateFilter = (text) =>
-  text.replace(FURIGANA, (m, _b: string, reading: string) => (reading.startsWith("sound:") ? m : reading));
+  text.replace(FURIGANA, (m, _b: string, reading: string) =>
+    reading.startsWith("sound:") ? m : reading,
+  );
 const kanji: TemplateFilter = (text) =>
-  text.replace(FURIGANA, (m, base: string, reading: string) => (reading.startsWith("sound:") ? m : base));
+  text.replace(FURIGANA, (m, base: string, reading: string) =>
+    reading.startsWith("sound:") ? m : base,
+  );
 
 export const TYPE_ANSWER_MARKER = "\u0000kuru-typeans\u0000";
 
