@@ -1,0 +1,35 @@
+# Kuru — self-hosted. Usage:
+#   docker compose up -d --build        → http://localhost:3000
+# Optional: KURU_ACCESS_TOKEN=secret docker compose up -d   (require a token to sign in)
+name: kuru
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      KURU_ACCESS_TOKEN: ${KURU_ACCESS_TOKEN:-}
+      KURU_DEFAULT_TIMEZONE: ${KURU_TIMEZONE:-UTC}
+      KURU_MAX_UPLOAD_MB: ${KURU_MAX_UPLOAD_MB:-2048}
+    volumes:
+      - kuru-data:/data
+    restart: unless-stopped
+    # Not published: the frontend proxies /api to it.
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        KURU_API_URL: http://backend:8000
+        NEXT_PUBLIC_SOURCE_URL: ${KURU_SOURCE_URL:-}
+    ports:
+      - "${KURU_PORT:-3000}:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  kuru-data:

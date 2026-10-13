@@ -4,14 +4,30 @@
     {
       "name": "backend",
       "runtimeExecutable": "uv",
-      "runtimeArgs": ["run", "--project", "backend", "kuru", "serve", "--reload"],
+      "runtimeArgs": [
+        "run",
+        "--project",
+        "backend",
+        "kuru",
+        "serve",
+        "--reload"
+      ],
       "port": 8000
     },
     {
       "name": "frontend",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--dir", "frontend", "dev"],
+      "runtimeArgs": [
+        "--dir",
+        "frontend",
+        "dev"
+      ],
       "port": 3000
+    },
+    {
+      "name": "docker",
+      "url": "http://localhost:3100",
+      "port": 3100
     }
   ]
 }

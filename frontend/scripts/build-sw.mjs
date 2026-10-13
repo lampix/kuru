@@ -51,7 +51,9 @@ for (const file of await walk(appDir)) {
       .replace(/\.html$/, "")
       .split(path.sep)
       .join("/");
-  if (route.includes("_not-found") || route.includes("[")) continue;
+  // Skip internal pages (/_not-found, /_global-error: non-200 responses would fail the install)
+  // and unresolved dynamic segments.
+  if (route.split("/").some((segment) => segment.startsWith("_")) || route.includes("[")) continue;
   const revision = createHash("md5")
     .update(await readFile(file))
     .digest("hex");

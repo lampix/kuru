@@ -36,7 +36,7 @@ src/kuru/
   models/      SQLModel tables
   schemas/     request / response models
   services/    domain logic (FSRS, importer, scheduler queue, sync, stats)
-migrations/    Alembic revisions
+  migrations/  Alembic revisions (shipped with the package)
 ```
 
 ### Schema changes
@@ -45,4 +45,4 @@ migrations/    Alembic revisions
 uv run alembic revision --autogenerate -m "describe change"
 ```
 
-Review the generated file in `migrations/versions/` before committing.
+Review the generated file in `src/kuru/migrations/versions/` before committing.

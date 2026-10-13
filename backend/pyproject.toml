@@ -48,7 +48,7 @@ dev = [
 [tool.ruff]
 line-length = 100
 target-version = "py313"
-extend-exclude = ["migrations/versions"]
+extend-exclude = ["src/kuru/migrations/versions"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N", "UP", "B", "A", "C4", "SIM", "RUF", "PTH", "DTZ", "FAST", "S"]
@@ -62,6 +62,7 @@ strict = true
 python_version = "3.13"
 files = ["src", "tests"]
 plugins = ["pydantic.mypy"]
+exclude = ["src/kuru/migrations/versions/"]
 
 [[tool.mypy.overrides]]
 module = ["fsrs.*"]

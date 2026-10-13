@@ -9,7 +9,7 @@ from alembic.config import Config
 
 from kuru.core.config import get_settings
 
-MIGRATIONS_DIR = Path(__file__).resolve().parents[3] / "migrations"
+MIGRATIONS_DIR = Path(__file__).resolve().parents[1] / "migrations"
 
 
 def alembic_config(url: str | None = None) -> Config:
