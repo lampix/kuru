@@ -21,16 +21,21 @@ what we expect from contributions.
 1. Fork and create a feature branch from `main`.
 2. Keep changes focused; one logical change per commit.
 3. Use [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`, `chore:`, …).
-4. Make sure all checks pass locally before opening a pull request:
+4. Make sure all checks pass locally before opening a pull request — the same ones CI runs:
 
    ```bash
-   # backend
-   cd backend && uv run ruff check && uv run ruff format --check && uv run mypy && uv run pytest
-   # frontend
-   cd frontend && pnpm lint && pnpm typecheck && pnpm test
+   scripts/check.sh            # or: scripts/check.sh backend | frontend
    ```
 
 5. Significant architectural changes need an [ADR](docs/adr/README.md).
+
+## Tests
+
+* **Backend:** pytest. Anki packages are synthesised in `tests/anki_fixtures.py` for every format —
+  never commit real collections.
+* **Frontend:** Vitest (jsdom + fake-indexeddb). Scheduling parity with the backend is checked
+  against `shared/test-vectors/fsrs.json`; regenerate it with
+  `cd backend && uv run python scripts/generate_test_vectors.py` when scheduling changes.
 
 ## Translations
 

@@ -186,4 +186,6 @@ To support future deck-specific features without polluting the core code:
 * **Serwist** (`@serwist/next`) replaces the unmaintained `@ducanh2912/next-pwa` — see `docs/adr/0002-serwist.md`.
 * v1 is **single-user**, with per-row `user_id` ownership for future multi-user support — see `docs/adr/0003-single-user-with-ownership.md`.
 * Scheduling runs on the client (`ts-fsrs`) for every answer; the server replays the revlog as source of truth — see `docs/adr/0004-client-scheduling-server-truth.md`.
-* Tooling: `uv` for Python, `pnpm` for the frontend.
+* Locale lives in the URL (`/en`, `/de`), pages are static and there is no `proxy.ts` — see `docs/adr/0005-static-locale-routing.md`.
+* Imports are uploaded in resumable chunks — see `docs/adr/0006-chunked-uploads.md`.
+* Tooling: `uv` for Python, `pnpm` for the frontend; `scripts/check.sh` runs every check.
