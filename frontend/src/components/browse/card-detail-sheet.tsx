@@ -1,0 +1,196 @@
+"use client";
+
+import { useLiveQuery } from "dexie-react-hooks";
+import { useFormatter, useTranslations } from "next-intl";
+import { useEffect, useMemo, useState } from "react";
+
+import { ListRow, ListSection } from "@/components/ios";
+import { CardView } from "@/components/review/card-view";
+import { Dialog, DialogContent, DialogFooter, DialogTitle } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { api } from "@/lib/api/client";
+import type { HistoryEntry } from "@/lib/api/types";
+import { db } from "@/lib/db";
+import { CardState, Scheduler } from "@/lib/fsrs";
+import { renderCard } from "@/lib/render";
+import { presetForDeck } from "@/lib/study/deck-tree";
+import { applyMemory } from "@/lib/sync/outbox";
+
+const RATING_LABEL = ["", "again", "hard", "good", "easy"] as const;
+const RATING_COLOR = [
+  "text-label-2",
+  "text-ios-red",
+  "text-ios-orange",
+  "text-ios-blue",
+  "text-ios-green",
+];
+
+/** Card info: preview, memory state, review history and actions. */
+export function CardDetailSheet({
+  cardId,
+  onClose,
+}: {
+  cardId: number | null;
+  onClose: () => void;
+}) {
+  const t = useTranslations("browse");
+  const review = useTranslations("review");
+  const common = useTranslations("common");
+  const format = useFormatter();
+  const [history, setHistory] = useState<{ cardId: number; entries: HistoryEntry[] | null } | null>(
+    null,
+  );
+  const [confirmReset, setConfirmReset] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const data = useLiveQuery(async () => {
+    if (cardId === null) return null;
+    const card = await db.cards.get(cardId);
+    if (!card) return null;
+    const [noteType, deck, presets] = await Promise.all([
+      db.noteTypes.get(card.note_type_id),
+      db.decks.get(card.deck_id),
+      db.presets.toArray(),
+    ]);
+    return { card, noteType, deck, preset: deck ? presetForDeck(deck, presets) : undefined };
+  }, [cardId]);
+
+  useEffect(() => {
+    if (cardId === null) return;
+    let cancelled = false;
+    api.cardHistory(cardId).then(
+      (entries) => !cancelled && setHistory({ cardId, entries }),
+      () => !cancelled && setHistory({ cardId, entries: null }),
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [cardId, data?.card.reps]);
+
+  const rendered = useMemo(
+    () =>
+      data?.noteType ? renderCard(data.noteType, data.card, { deckName: data.deck?.name }) : null,
+    [data],
+  );
+  const retrievability = useMemo(
+    () => (data?.preset ? new Scheduler(data.preset).retrievability(data.card) : null),
+    [data],
+  );
+
+  const act = async (action: "suspend" | "unsuspend" | "forget") => {
+    if (!data) return;
+    setError(null);
+    try {
+      const [memory] = await api.cardActions([data.card.id], action);
+      if (memory) await db.cards.put(applyMemory(data.card, memory));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err));
+    }
+  };
+
+  const card = data?.card;
+  const entries = history?.cardId === cardId ? history.entries : undefined;
+  const percent = (v: number | null) =>
+    v === null ? "–" : format.number(v, { style: "percent", maximumFractionDigits: 0 });
+  const number = (v: number | null) =>
+    v === null ? "–" : format.number(v, { maximumFractionDigits: 2 });
+
+  return (
+    <Sheet open={cardId !== null} onOpenChange={(open) => !open && onClose()}>
+      <SheetContent
+        side="bottom"
+        className="max-h-[92dvh] overflow-y-auto rounded-t-[14px] border-0 bg-grouped px-4 pb-[calc(env(safe-area-inset-bottom)+16px)]"
+      >
+        <SheetTitle className="pt-4 text-center text-headline">{t("cardInfo")}</SheetTitle>
+        {card && rendered ? (
+          <>
+            <div className="mt-3 max-h-64 shrink-0 overflow-y-auto rounded-[14px] bg-grouped-2">
+              <CardView html={rendered.answer} css={rendered.css} />
+            </div>
+            <ListSection>
+              <ListRow title={t("deck")} detail={data?.deck?.name.replaceAll("::", " › ")} />
+              <ListRow title={t("noteType")} detail={data?.noteType?.name} />
+              <ListRow title={t("tags")} detail={card.tags.join(" ") || "–"} />
+              <ListRow
+                title={t("due")}
+                detail={
+                  card.state === CardState.New || !card.due
+                    ? t("stateNew")
+                    : format.dateTime(new Date(card.due), { dateStyle: "medium" })
+                }
+              />
+              <ListRow
+                title={t("stability")}
+                detail={card.stability === null ? "–" : `${number(card.stability)} d`}
+              />
+              <ListRow title={t("difficulty")} detail={number(card.difficulty)} />
+              <ListRow title={t("retrievability")} detail={percent(retrievability)} />
+              <ListRow title={t("reviews")} detail={format.number(card.reps)} />
+              <ListRow title={t("lapses")} detail={format.number(card.lapses)} />
+            </ListSection>
+
+            <ListSection>
+              <ListRow
+                title={card.suspended ? t("unsuspend") : t("suspend")}
+                tinted
+                onClick={() => void act(card.suspended ? "unsuspend" : "suspend")}
+              />
+              <ListRow title={t("forget")} destructive onClick={() => setConfirmReset(true)} />
+            </ListSection>
+            {error ? <p className="mt-2 px-4 text-footnote text-ios-red">{error}</p> : null}
+
+            <ListSection header={t("history")}>
+              {entries === undefined ? (
+                <ListRow title={common("loading")} />
+              ) : entries === null ? (
+                <ListRow title={common("offline")} />
+              ) : entries.length === 0 ? (
+                <ListRow title="–" />
+              ) : (
+                entries.slice(0, 50).map((entry) => (
+                  <ListRow
+                    key={entry.id}
+                    title={format.dateTime(new Date(entry.reviewed_at), {
+                      dateStyle: "medium",
+                      timeStyle: "short",
+                    })}
+                    detail={
+                      <span className={RATING_COLOR[entry.rating]}>
+                        {entry.rating ? review(RATING_LABEL[entry.rating] as "again") : t("forget")}
+                      </span>
+                    }
+                  />
+                ))
+              )}
+            </ListSection>
+          </>
+        ) : null}
+      </SheetContent>
+
+      <Dialog open={confirmReset} onOpenChange={setConfirmReset}>
+        <DialogContent
+          className="max-w-[280px] rounded-[14px] border-0 bg-grouped-2 p-0 text-center"
+          showCloseButton={false}
+        >
+          <DialogTitle className="px-4 pt-5 text-headline">{t("forget")}</DialogTitle>
+          <p className="px-4 pb-4 text-footnote">{t("forgetConfirm")}</p>
+          <DialogFooter className="grid grid-cols-2 gap-0 hairline-t sm:flex-none">
+            <button type="button" className="py-3 text-tint" onClick={() => setConfirmReset(false)}>
+              {common("cancel")}
+            </button>
+            <button
+              type="button"
+              className="py-3 font-semibold text-ios-red"
+              onClick={() => {
+                setConfirmReset(false);
+                void act("forget");
+              }}
+            >
+              {t("forget")}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </Sheet>
+  );
+}

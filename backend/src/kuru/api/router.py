@@ -13,6 +13,7 @@ from kuru.api.routes import (
     media,
     presets,
     scheduling,
+    stats,
     sync,
 )
 
@@ -26,3 +27,4 @@ api_router.include_router(presets.router)
 api_router.include_router(cards.router)
 api_router.include_router(sync.router)
 api_router.include_router(media.router)
+api_router.include_router(stats.router)

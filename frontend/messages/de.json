@@ -87,7 +87,8 @@
     "history": "Wiederholungsverlauf",
     "selected": "{count} ausgewählt",
     "select": "Auswählen",
-    "results": "{count, plural, one {# Karte} other {# Karten}}"
+    "results": "{count, plural, one {# Karte} other {# Karten}}",
+    "stateRelearning": "Wiederlernen"
   },
   "stats": {
     "title": "Statistik",

@@ -127,3 +127,34 @@ export interface Me {
   timezone: string;
   day_rollover_hour: number;
 }
+
+export interface DayActivity {
+  day: string;
+  reviews: number;
+  again: number;
+  new: number;
+  duration_ms: number;
+}
+
+export interface Stats {
+  today: DayActivity;
+  activity: DayActivity[];
+  retention: number | null;
+  retention_reviews: number;
+  forecast: Array<{ day: string; count: number }>;
+  card_counts: Record<"new" | "learning" | "review" | "relearning" | "suspended", number>;
+  stability: Array<{ label: string; count: number }>;
+  difficulty: Array<{ label: string; count: number }>;
+  average_retrievability: number | null;
+  total_reviews: number;
+  streak: number;
+}
+
+export interface HistoryEntry {
+  id: string;
+  rating: number;
+  reviewed_at: string;
+  kind: number;
+  interval: number | null;
+  duration_ms: number | null;
+}

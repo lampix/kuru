@@ -220,3 +220,10 @@ describe("helpers", () => {
     );
   });
 });
+
+describe("clozeToPlain", () => {
+  it("reveals all deletions", async () => {
+    const { clozeToPlain } = await import("./cloze");
+    expect(clozeToPlain("{{c1::Tokyo::city}} is in {{c2::Japan}}")).toBe("Tokyo is in Japan");
+  });
+});

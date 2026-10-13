@@ -320,7 +320,7 @@ function Finished({
       <p className="max-w-xs text-label-2">{t("finishedHint")}</p>
       {nextDue ? (
         <p className="text-subhead text-label-2">
-          {t("nextLearning", { time: format.relativeTime(nextDue) })}
+          {t("nextLearning", { time: format.relativeTime(nextDue, new Date()) })}
         </p>
       ) : null}
       <Link href="/" className={cn(iosButton({ variant: "tinted" }), "mt-4")}>

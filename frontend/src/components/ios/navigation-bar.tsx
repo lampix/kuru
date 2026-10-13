@@ -79,13 +79,16 @@ export function NavigationPage({
           </h2>
           <div className="z-10 flex flex-1 items-center justify-end gap-1">{trailing}</div>
         </div>
-        {accessory ? <div className="mx-auto max-w-3xl px-4 pb-2">{accessory}</div> : null}
+        {accessory && !largeTitle ? (
+          <div className="mx-auto max-w-3xl px-4 pb-2">{accessory}</div>
+        ) : null}
       </header>
       <main className="mx-auto max-w-3xl px-4 pb-8">
         {largeTitle ? (
           <>
             <h1 className="pt-1 pb-2 text-large-title font-bold">{title}</h1>
             <div ref={sentinel} aria-hidden className="h-px" />
+            {accessory ? <div className="pb-3">{accessory}</div> : null}
           </>
         ) : null}
         {children}

@@ -115,3 +115,8 @@ export function activeClozeText(text: string, ordinal: number): string {
 export function clozeOnly(text: string, ordinal: number): string {
   return activeClozeText(text, ordinal);
 }
+
+/** Cloze text with all deletions revealed, e.g. for search and list titles. */
+export function clozeToPlain(text: string): string {
+  return plain(parseCloze(text));
+}

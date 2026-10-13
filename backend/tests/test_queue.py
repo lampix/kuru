@@ -182,3 +182,32 @@ def test_card_actions_api(client: TestClient, session: Session, user: User) -> N
     assert card.deck_id == other["id"]
     bad = client.post("/api/cards/actions", json={"card_ids": [card.id], "action": "move"})
     assert bad.status_code == 422
+
+
+def test_stats_and_history(client: TestClient, session: Session, user: User) -> None:
+    now = utcnow()
+    card = make_review_card(session, user, due=now - timedelta(days=1))
+    make_card(session, user)
+    assert card.id is not None
+    for minutes, rating in ((30, 3), (10, 1)):
+        record_reviews(
+            session,
+            user,
+            [
+                ReviewSubmission(
+                    id=str(uuid4()),
+                    card_id=card.id,
+                    rating=rating,
+                    reviewed_at=now - timedelta(minutes=minutes),
+                )
+            ],
+        )
+    stats = client.get("/api/stats").json()
+    assert stats["today"]["reviews"] == 2
+    assert stats["today"]["again"] == 1
+    assert stats["retention"] == 0.5
+    assert stats["streak"] == 1
+    assert stats["card_counts"]["new"] == 1
+    assert len(stats["activity"]) == 30 and len(stats["forecast"]) == 30
+    history = client.get(f"/api/cards/{card.id}/history").json()
+    assert [h["rating"] for h in history] == [1, 3]

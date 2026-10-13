@@ -2,6 +2,7 @@
 
 import type {
   CardMemory,
+  HistoryEntry,
   ImportJob,
   MediaEntry,
   Me,
@@ -9,6 +10,7 @@ import type {
   RecentReview,
   ReviewBatchResult,
   ReviewIn,
+  Stats,
   StudyCard,
   SyncMeta,
 } from "./types";
@@ -126,6 +128,9 @@ export const api = {
       body: { name?: string; description?: string; config_id?: number | null },
     ) => request<unknown>(`/decks/${id}`, { method: "PATCH", ...json(body) }),
   },
+
+  stats: (deckId?: number | null) => request<Stats>(`/stats${query({ deck_id: deckId ?? null })}`),
+  cardHistory: (cardId: number) => request<HistoryEntry[]>(`/cards/${cardId}/history`),
 
   imports: {
     status: (id: string) => request<ImportJob>(`/import/status/${id}`),

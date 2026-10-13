@@ -87,7 +87,8 @@
     "history": "Review History",
     "selected": "{count} selected",
     "select": "Select",
-    "results": "{count, plural, one {# card} other {# cards}}"
+    "results": "{count, plural, one {# card} other {# cards}}",
+    "stateRelearning": "Relearning"
   },
   "stats": {
     "title": "Statistics",
