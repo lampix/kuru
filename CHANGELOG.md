@@ -11,6 +11,7 @@ All notable changes to this project are documented here. The format follows
   (and sub-decks) will be deleted permanently.
 
 ### Fixed
+- Audio buttons in the card browser's card info did not play anything.
 - Deleting a deck also removes notes left without cards (as in Anki) and uses bulk deletes.
 - Importing no longer duplicates the "Default" preset: Anki's built-in options group is merged into
   Kuru's Default; existing duplicates are merged by a database migration.

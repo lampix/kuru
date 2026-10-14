@@ -9,6 +9,7 @@ import { CardView } from "@/components/review/card-view";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { api } from "@/lib/api/client";
 import type { HistoryEntry } from "@/lib/api/types";
+import { AudioPlayer } from "@/lib/audio";
 import { db } from "@/lib/db";
 import { CardState, Scheduler } from "@/lib/fsrs";
 import { renderCard } from "@/lib/render";
@@ -40,6 +41,10 @@ export function CardDetailSheet({
     null,
   );
   const [confirmReset, setConfirmReset] = useState(false);
+  const audio = useMemo(() => new AudioPlayer(), []);
+
+  // Stop playback when another card is shown, the sheet closes or the screen unmounts.
+  useEffect(() => () => audio.stop(), [audio, cardId]);
   const [error, setError] = useState<string | null>(null);
 
   const data = useLiveQuery(async () => {
@@ -104,7 +109,11 @@ export function CardDetailSheet({
         {card && rendered ? (
           <>
             <div className="mt-3 max-h-64 shrink-0 overflow-y-auto rounded-[14px] bg-grouped-2">
-              <CardView html={rendered.answer} css={rendered.css} />
+              <CardView
+                html={rendered.answer}
+                css={rendered.css}
+                onPlaySound={(name) => void audio.play(name)}
+              />
             </div>
             <ListSection>
               <ListRow title={t("deck")} detail={data?.deck?.name.replaceAll("::", " › ")} />
