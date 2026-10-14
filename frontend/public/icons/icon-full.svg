@@ -1,0 +1,24 @@
+<!-- Kuru app icon: a stack of cards with クル (kuru). Full-bleed variant for apple-touch-icon / maskable icons (the OS rounds them).
+     PNGs are generated from these SVGs, see public/icons/README.md. -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5e8bff"/>
+      <stop offset="1" stop-color="#3355e0"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <g transform="translate(256 262)">
+    <rect x="-118" y="-150" width="236" height="290" rx="34" fill="#ffffff" opacity="0.35" transform="rotate(-12)"/>
+    <rect x="-118" y="-150" width="236" height="290" rx="34" fill="#ffffff" opacity="0.6" transform="rotate(-5)"/>
+    <rect x="-118" y="-150" width="236" height="290" rx="34" fill="#ffffff"/>
+    <g stroke="#3355e0" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <!-- ク -->
+      <path d="M-58 -78 Q-70 -42 -100 -14"/>
+      <path d="M-71 -56 H-22 Q-24 22 -94 78"/>
+      <!-- ル -->
+      <path d="M38 -70 V-4 Q36 48 14 78"/>
+      <path d="M72 -74 V58 Q72 76 89 66 L104 54"/>
+    </g>
+  </g>
+</svg>

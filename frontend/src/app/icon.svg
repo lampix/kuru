@@ -1,3 +1,5 @@
+<!-- Kuru app icon: a stack of cards with クル (kuru). Rounded variant (iOS corner radius ≈ 22.4 %).
+     PNGs are generated from these SVGs, see public/icons/README.md. -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
@@ -5,12 +7,18 @@
       <stop offset="1" stop-color="#3355e0"/>
     </linearGradient>
   </defs>
-  <rect width="512" height="512" fill="url(#bg)"/>
+  <rect width="512" height="512" rx="115" fill="url(#bg)"/>
   <g transform="translate(256 262)">
     <rect x="-118" y="-150" width="236" height="290" rx="34" fill="#ffffff" opacity="0.35" transform="rotate(-12)"/>
     <rect x="-118" y="-150" width="236" height="290" rx="34" fill="#ffffff" opacity="0.6" transform="rotate(-5)"/>
     <rect x="-118" y="-150" width="236" height="290" rx="34" fill="#ffffff"/>
-    <path d="M-62 -52 H62 M-74 8 H74 M0 -96 V110 M0 8 L-66 92 M0 8 L66 92 M-40 -52 L-24 -14 M40 -52 L24 -14"
-          stroke="#3355e0" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <g stroke="#3355e0" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <!-- ク -->
+      <path d="M-58 -78 Q-70 -42 -100 -14"/>
+      <path d="M-71 -56 H-22 Q-24 22 -94 78"/>
+      <!-- ル -->
+      <path d="M38 -70 V-4 Q36 48 14 78"/>
+      <path d="M72 -74 V58 Q72 76 89 66 L104 54"/>
+    </g>
   </g>
 </svg>
