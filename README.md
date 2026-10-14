@@ -8,6 +8,8 @@ history**, so you keep every bit of progress, and schedules reviews with the mod
 [FSRS](https://github.com/open-spaced-repetition) algorithm — on the server *and* on your device,
 so reviewing works without a connection.
 
+Written in katakana, the name also echoes 来る (*"to come"*) — as in cards coming back for review.
+
 <p align="center">
   <img src="docs/screenshots/decks.jpg" alt="Deck list" width="200">
   <img src="docs/screenshots/review.jpg" alt="Review with FSRS interval previews" width="200">
