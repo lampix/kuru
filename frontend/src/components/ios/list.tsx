@@ -85,7 +85,7 @@ export function ListRow({
         <span className="min-w-0 flex-1 text-left">
           <span
             className={cn(
-              "block truncate",
+              "block leading-snug break-words",
               destructive && "text-ios-red",
               tinted && "text-tint",
               disabled && "opacity-40",
@@ -98,7 +98,7 @@ export function ListRow({
           ) : null}
         </span>
         {detail !== undefined ? (
-          <span className="shrink-0 truncate text-right text-label-2">{detail}</span>
+          <span className="max-w-[60%] min-w-0 truncate text-right text-label-2">{detail}</span>
         ) : null}
         {accessory}
         {(chevron ?? (href ? true : false)) ? (
@@ -152,6 +152,17 @@ export function SwitchRow({
   );
 }
 
+/** Shared layout of a row with a title and a trailing control. */
+function ControlRow({ title, children }: { title: ReactNode; children: ReactNode }) {
+  return (
+    <span className="flex min-h-11 min-w-0 flex-1 items-center gap-3 py-2 pr-4 pl-4 hairline-b group-last/row:shadow-none">
+      {/* Long (e.g. German) titles wrap instead of pushing the control out of the card. */}
+      <span className="min-w-0 flex-1 leading-snug break-words">{title}</span>
+      {children}
+    </span>
+  );
+}
+
 /** A row with a right-aligned input (numbers, short text). */
 export function InputRow({
   title,
@@ -161,17 +172,54 @@ export function InputRow({
 }: { title: ReactNode; suffix?: ReactNode } & ComponentProps<"input">) {
   return (
     <label className="group/row flex w-full items-center">
-      <span className="flex min-h-11 flex-1 items-center gap-3 py-2 pr-4 pl-4 hairline-b group-last/row:shadow-none">
-        <span className="flex-1 truncate">{title}</span>
-        <input
+      <ControlRow title={title}>
+        <span className="flex max-w-[50%] min-w-0 shrink-0 items-center justify-end gap-0.5">
+          <input
+            className={cn(
+              "w-20 min-w-0 bg-transparent text-right text-label-2 outline-none focus:text-label",
+              className,
+            )}
+            {...props}
+          />
+          {suffix ? <span className="shrink-0 text-label-2">{suffix}</span> : null}
+        </span>
+      </ControlRow>
+    </label>
+  );
+}
+
+/** A row with a native picker (rendered as right-aligned value text, like iOS menus). */
+export function SelectRow({
+  title,
+  className,
+  children,
+  ...props
+}: { title: ReactNode } & ComponentProps<"select">) {
+  return (
+    <label className="group/row flex w-full items-center">
+      <ControlRow title={title}>
+        <select
           className={cn(
-            "w-28 bg-transparent text-right text-label-2 outline-none focus:text-label",
+            "max-w-[60%] min-w-0 truncate bg-transparent text-right text-label-2 outline-none [text-align-last:right]",
             className,
           )}
           {...props}
-        />
-        {suffix ? <span className="text-label-2">{suffix}</span> : null}
-      </span>
+        >
+          {children}
+        </select>
+      </ControlRow>
     </label>
+  );
+}
+
+/** A row whose control sits below the title (segmented controls and other wide controls). */
+export function StackedRow({ title, children }: { title: ReactNode; children: ReactNode }) {
+  return (
+    <div className="group/row flex w-full">
+      <div className="flex min-w-0 flex-1 flex-col gap-2 py-2.5 pr-4 pl-4 hairline-b group-last/row:shadow-none">
+        <span className="leading-snug">{title}</span>
+        {children}
+      </div>
+    </div>
   );
 }

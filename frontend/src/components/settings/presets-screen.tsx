@@ -4,7 +4,7 @@ import { Check, Plus } from "lucide-react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
-import { type ReactNode, useState } from "react";
+import { useState } from "react";
 
 import {
   BarButton,
@@ -13,6 +13,7 @@ import {
   ListSection,
   NavigationPage,
   SegmentedControl,
+  StackedRow,
   SwitchRow,
 } from "@/components/ios";
 import { useRouter } from "@/i18n/navigation";
@@ -252,7 +253,7 @@ function PresetEditor({
           title={t("presetName")}
           value={draft.name}
           disabled={disabled}
-          className="w-44"
+          className="w-full"
           onChange={(e) => set("name", e.target.value)}
         />
       </ListSection>
@@ -276,7 +277,7 @@ function PresetEditor({
           value={draft.reviews_per_day}
           onChange={(e) => set("reviews_per_day", number(e.target.value, 0))}
         />
-        <Row title={t("newCardOrder")}>
+        <StackedRow title={t("newCardOrder")}>
           <SegmentedControl
             ariaLabel={t("newCardOrder")}
             value={draft.new_card_order}
@@ -285,9 +286,8 @@ function PresetEditor({
               { value: "sequential", label: t("orderSequential") },
               { value: "random", label: t("orderRandom") },
             ]}
-            className="w-44 shrink-0"
           />
-        </Row>
+        </StackedRow>
       </ListSection>
 
       <ListSection header={t("steps")} footer={t("stepsFooter")}>
@@ -404,16 +404,5 @@ function PresetEditor({
         </ListSection>
       ) : null}
     </NavigationPage>
-  );
-}
-
-function Row({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <div className="group/row flex items-center">
-      <div className="flex min-h-11 flex-1 items-center gap-3 py-2 pr-3 pl-4 hairline-b group-last/row:shadow-none">
-        <span className="flex-1 truncate">{title}</span>
-        {children}
-      </div>
-    </div>
   );
 }

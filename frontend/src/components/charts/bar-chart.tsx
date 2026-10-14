@@ -47,6 +47,7 @@ export function BarChart({
   const barWidth = Math.max(1, Math.min(MAX_BAR, band - GAP));
   const plot = HEIGHT - TOP - BOTTOM;
   const activeDatum = active !== null ? data[active] : undefined;
+  const tooltipAnchor = active !== null ? (active + 0.5) / data.length : 0;
 
   const onMove = (event: React.PointerEvent<SVGSVGElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -55,7 +56,7 @@ export function BarChart({
   };
 
   return (
-    <figure className={cn("relative", className)}>
+    <figure className={cn("relative pt-8", className)}>
       <svg
         viewBox={`0 0 ${width} ${HEIGHT}`}
         className="w-full touch-none overflow-visible select-none"
@@ -109,11 +110,13 @@ export function BarChart({
         ) : null}
       </svg>
       {activeDatum ? (
+        // Rendered in a reserved lane above the plot: the card around the chart clips overflow.
+        // Anchoring by the bar's relative position keeps it inside the card at both edges.
         <div
-          className="pointer-events-none absolute -top-2 rounded-lg bg-grouped-3 px-2 py-1 text-footnote whitespace-nowrap shadow-md"
+          className="pointer-events-none absolute top-0 rounded-lg bg-grouped-3 px-2 py-1 text-footnote whitespace-nowrap shadow-md"
           style={{
-            left: `${((active! + 0.5) / data.length) * 100}%`,
-            transform: `translateX(${active! < data.length / 2 ? "-20%" : "-80%"}) translateY(-100%)`,
+            left: `${tooltipAnchor * 100}%`,
+            transform: `translateX(-${tooltipAnchor * 100}%)`,
           }}
         >
           {activeDatum.tooltip ?? `${activeDatum.label}: ${formatValue(activeDatum.value)}`}

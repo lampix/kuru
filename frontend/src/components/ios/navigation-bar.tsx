@@ -6,6 +6,9 @@ import { type ReactNode, useEffect, useRef, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
+/** Characters (back label + title) that fit side by side on a 375pt-wide bar. */
+const BACK_LABEL_BUDGET = 26;
+
 interface NavigationPageProps {
   title: string;
   /** Show a large title that collapses into the bar on scroll (iOS default for root screens). */
@@ -34,6 +37,8 @@ export function NavigationPage({
   className,
 }: NavigationPageProps) {
   const sentinel = useRef<HTMLDivElement>(null);
+  // Like iOS, drop the back button's text when it would not fit next to the title.
+  const showBackLabel = back ? back.label.length + title.length <= BACK_LABEL_BUDGET : false;
   const [collapsed, setCollapsed] = useState(!largeTitle);
 
   useEffect(() => {
@@ -54,15 +59,17 @@ export function NavigationPage({
           collapsed ? "glass hairline-b" : "bg-grouped",
         )}
       >
-        <div className="relative mx-auto flex h-11 max-w-3xl items-center px-2">
-          <div className="z-10 flex min-w-0 flex-1 items-center">
+        {/* Two equal-width sides keep the title centred without ever overlapping them. */}
+        <div className="mx-auto flex h-11 max-w-3xl items-center gap-1 px-2">
+          <div className="flex min-w-0 flex-1 basis-0 items-center">
             {back ? (
               <Link
                 href={back.href}
-                className="flex items-center gap-0.5 rounded-md py-1 pr-2 text-body text-tint active:opacity-50"
+                aria-label={back.label}
+                className="flex min-w-0 items-center gap-0.5 rounded-md py-1 pr-2 text-body text-tint active:opacity-50"
               >
-                <ChevronLeft className="-ml-1 size-7" strokeWidth={2.4} aria-hidden />
-                <span className="truncate">{back.label}</span>
+                <ChevronLeft className="-ml-1 size-7 shrink-0" strokeWidth={2.4} aria-hidden />
+                {showBackLabel ? <span className="truncate">{back.label}</span> : null}
               </Link>
             ) : (
               leading
@@ -71,13 +78,15 @@ export function NavigationPage({
           <h2
             aria-hidden={largeTitle && !collapsed}
             className={cn(
-              "pointer-events-none absolute inset-x-24 truncate text-center text-headline font-semibold transition-opacity duration-200",
+              "pointer-events-none max-w-[60%] shrink truncate text-center text-headline font-semibold transition-opacity duration-200",
               collapsed ? "opacity-100" : "opacity-0",
             )}
           >
             {title}
           </h2>
-          <div className="z-10 flex flex-1 items-center justify-end gap-1">{trailing}</div>
+          <div className="flex min-w-0 flex-1 basis-0 items-center justify-end gap-1">
+            {trailing}
+          </div>
         </div>
         {accessory && !largeTitle ? (
           <div className="mx-auto max-w-3xl px-4 pb-2">{accessory}</div>

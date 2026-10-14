@@ -6,7 +6,7 @@ import { useFormatter, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
 import { BarChart, StatTile } from "@/components/charts/bar-chart";
-import { ListSection, NavigationPage } from "@/components/ios";
+import { ListSection, NavigationPage, SelectRow } from "@/components/ios";
 import { api } from "@/lib/api/client";
 import type { Stats } from "@/lib/api/types";
 import { db } from "@/lib/db";
@@ -64,12 +64,11 @@ export function StatsScreen() {
 
   return (
     <NavigationPage title={t("title")}>
-      <label className="mt-2 flex items-center gap-3 rounded-[10px] bg-grouped-2 px-4 py-2.5">
-        <span className="flex-1">{browse("deck")}</span>
-        <select
+      <div className="mt-2 overflow-hidden rounded-[10px] bg-grouped-2">
+        <SelectRow
+          title={browse("deck")}
           value={deckId ?? ""}
           onChange={(e) => setDeckId(e.target.value ? Number(e.target.value) : null)}
-          className="max-w-[60%] bg-transparent text-right text-label-2 outline-none"
         >
           <option value="">{browse("allDecks")}</option>
           {decks?.map((d) => (
@@ -77,8 +76,8 @@ export function StatsScreen() {
               {d.name.replaceAll("::", " › ")}
             </option>
           ))}
-        </select>
-      </label>
+        </SelectRow>
+      </div>
 
       {result?.failed ? (
         <div className="flex flex-col items-center gap-3 py-20 text-center text-label-2">
@@ -104,7 +103,7 @@ export function StatsScreen() {
           </div>
 
           <ListSection header={t("reviewsPerDay")} footer={t("last30Days")}>
-            <div className="px-4 pt-6 pb-3">
+            <div className="px-4 pt-2 pb-3">
               <BarChart
                 title={t("reviewsPerDay")}
                 data={stats.activity.map((a) => ({
@@ -118,7 +117,7 @@ export function StatsScreen() {
           </ListSection>
 
           <ListSection header={t("forecast")} footer={t("forecastHint")}>
-            <div className="px-4 pt-6 pb-3">
+            <div className="px-4 pt-2 pb-3">
               <BarChart
                 title={t("forecast")}
                 data={stats.forecast.map((f) => ({
@@ -152,7 +151,7 @@ export function StatsScreen() {
             header={t("stability")}
             footer={`${t("averageRetrievability")}: ${percent(stats.average_retrievability)}`}
           >
-            <div className="px-4 pt-6 pb-3">
+            <div className="px-4 pt-2 pb-3">
               <BarChart
                 title={t("stability")}
                 data={stats.stability.map((b) => ({
@@ -168,7 +167,7 @@ export function StatsScreen() {
             header={t("difficulty")}
             footer={`${t("totalReviews")}: ${format.number(stats.total_reviews)}`}
           >
-            <div className="px-4 pt-6 pb-3">
+            <div className="px-4 pt-2 pb-3">
               <BarChart
                 title={t("difficulty")}
                 data={stats.difficulty.map((b) => ({

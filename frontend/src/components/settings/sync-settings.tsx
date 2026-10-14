@@ -3,7 +3,7 @@
 import { useFormatter, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
-import { InputRow, ListRow, ListSection } from "@/components/ios";
+import { InputRow, ListRow, ListSection, SelectRow } from "@/components/ios";
 import { Dialog, DialogContent, DialogFooter, DialogTitle } from "@/components/ui/dialog";
 import { useRouter } from "@/i18n/navigation";
 import { api } from "@/lib/api/client";
@@ -80,32 +80,27 @@ export function SyncSettings() {
 
       {me ? (
         <ListSection header={t("studyDay")}>
-          <label className="group/row flex items-center">
-            <span className="flex min-h-11 flex-1 items-center gap-3 py-2 pr-4 pl-4 hairline-b">
-              <span className="flex-1">{t("timezone")}</span>
-              <select
-                value={me.timezone}
-                onChange={(e) => void updateMe({ timezone: e.target.value })}
-                className="max-w-[55%] bg-transparent text-right text-label-2 outline-none"
-              >
-                {(timezones.includes(me.timezone) ? timezones : [me.timezone, ...timezones]).map(
-                  (tz) => (
-                    <option key={tz} value={tz}>
-                      {tz}
-                    </option>
-                  ),
-                )}
-              </select>
-            </span>
-          </label>
+          <SelectRow
+            title={t("timezone")}
+            value={me.timezone}
+            onChange={(e) => void updateMe({ timezone: e.target.value })}
+          >
+            {(timezones.includes(me.timezone) ? timezones : [me.timezone, ...timezones]).map(
+              (tz) => (
+                <option key={tz} value={tz}>
+                  {tz}
+                </option>
+              ),
+            )}
+          </SelectRow>
           <InputRow
             title={t("rolloverHour")}
             type="number"
             min={0}
             max={23}
             value={me.day_rollover_hour}
-            suffix={<span className="-ml-3">:00</span>}
-            className="w-10"
+            suffix=":00"
+            className="w-8"
             onChange={(e) => {
               const hour = Number(e.target.value);
               if (Number.isInteger(hour) && hour >= 0 && hour <= 23)

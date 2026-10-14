@@ -135,7 +135,7 @@ export function BrowseScreen() {
         <select
           value={deckId ?? ""}
           onChange={(e) => setDeckId(e.target.value ? Number(e.target.value) : null)}
-          className="max-w-[60%] bg-transparent text-right text-tint outline-none"
+          className="max-w-[60%] min-w-0 truncate bg-transparent text-right text-tint outline-none [text-align-last:right]"
           aria-label={t("deck")}
         >
           <option value="">{t("allDecks")}</option>
