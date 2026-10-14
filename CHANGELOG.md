@@ -6,9 +6,18 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-14
+
 ### Added
 - "Delete Deck" at the bottom of a deck's options, with a confirmation that states how many cards
   (and sub-decks) will be deleted permanently.
+
+### Changed
+- Deck options save automatically (iOS Settings style) with a "Saved" confirmation; the Cancel/Save
+  bar buttons are replaced by a back arrow. Number fields no longer snap to 0 while retyping.
+- The import hint explains that Anki must export deck presets for options to carry over.
+- Presets can only be deleted from the preset list (not from a deck's options) and always ask for
+  confirmation, naming the preset their decks switch to. The Default preset cannot be deleted.
 
 ### Fixed
 - Audio buttons in the card browser's card info did not play anything.
@@ -17,13 +26,7 @@ All notable changes to this project are documented here. The format follows
   Kuru's Default; existing duplicates are merged by a database migration.
 - Imports of collections from newer Anki versions failed on newer SQLite builds ("no query
   solution") because Anki's `unicase` collation was not defined.
-
-### Changed
-- Deck options save automatically (iOS Settings style) with a "Saved" confirmation; the Cancel/Save
-  bar buttons are replaced by a back arrow. Number fields no longer snap to 0 while retyping.
-- The import hint explains that Anki must export deck presets for options to carry over.
-- Presets can only be deleted from the preset list (not from a deck's options) and always ask for
-  confirmation, naming the preset their decks switch to. The Default preset cannot be deleted.
+- Settings → About always showed version 0.1.0; it now shows the installed version.
 
 ## [0.1.0] - 2026-10-14
 

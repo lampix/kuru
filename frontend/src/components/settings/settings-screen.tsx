@@ -33,7 +33,7 @@ export function SettingsScreen() {
         <ListRow
           icon={<RowIcon icon={Info} color="var(--ios-gray)" />}
           title={t("version")}
-          detail={process.env.NEXT_PUBLIC_APP_VERSION ?? "0.1.0"}
+          detail={process.env.NEXT_PUBLIC_APP_VERSION}
         />
         {SOURCE_URL ? (
           <ListRow
