@@ -2,7 +2,7 @@
 
 > A modern, offline-first spaced repetition PWA — Anki-compatible, powered by FSRS-6.
 
-Kuru (来る, *"to come"*) is a self-hosted spaced repetition system with an iOS-native look and feel.
+Kuru (クル, from 繰る — *"to turn (pages)"*) is a self-hosted spaced repetition system with an iOS-native look and feel.
 It imports your existing Anki collections (`.apkg` / `.colpkg`) **including the complete review
 history**, so you keep every bit of progress, and schedules reviews with the modern
 [FSRS](https://github.com/open-spaced-repetition) algorithm — on the server *and* on your device,
