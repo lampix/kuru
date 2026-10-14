@@ -217,3 +217,25 @@ def test_chunked_upload(client: TestClient, tmp_path: Path) -> None:
     assert (
         client.post("/api/import/uploads", json={"filename": "x.txt", "size": 1}).status_code == 415
     )
+
+
+def test_anki_default_preset_merges_into_kuru_default(
+    session: Session, user: User, settings: Settings, package: Path
+) -> None:
+    # The first sync creates Kuru's own Default before anything is imported.
+    from kuru.services.presets import default_preset
+
+    kuru_default = default_preset(session, user)
+    session.commit()
+    run_import(session, user, settings, package)
+    run_import(session, user, settings, package)  # re-import must not duplicate either
+
+    defaults = session.exec(select(DeckConfig).where(DeckConfig.name == "Default")).all()
+    assert len(defaults) == 1
+    merged = defaults[0]
+    assert merged.id == kuru_default.id
+    assert merged.anki_id == 1
+    assert merged.new_per_day == 20  # Anki's Default values from the package
+    default_deck = session.exec(select(Deck).where(Deck.name == "Default")).first()
+    if default_deck is not None:
+        assert default_deck.config_id == merged.id

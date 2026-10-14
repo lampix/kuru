@@ -156,7 +156,7 @@
     "failed": "Import fehlgeschlagen",
     "summary": "{notes} Notizen · {cards} Karten · {reviews} Wiederholungen · {media} Mediendateien",
     "recent": "Letzte Importe",
-    "exportHint": "Wähle in Anki „Datei → Exportieren“, dann „Anki-Sammlungspaket“ oder „Anki-Stapelpaket“ und schließe Lernfortschritt und Medien ein."
+    "exportHint": "Wähle in Anki „Datei → Exportieren“, dann „Anki-Sammlungspaket“ oder „Anki-Stapelpaket“ und schließe Lernfortschritt, Stapel-Voreinstellungen und Medien ein – ohne Voreinstellungen exportiert Anki nur seine Standardoptionen."
   },
   "options": {
     "title": "Stapeloptionen",

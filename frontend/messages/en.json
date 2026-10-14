@@ -156,7 +156,7 @@
     "failed": "Import failed",
     "summary": "{notes} notes · {cards} cards · {reviews} reviews · {media} media files",
     "recent": "Recent Imports",
-    "exportHint": "In Anki choose File → Export, select “Anki Collection Package” or “Anki Deck Package” and include scheduling information and media."
+    "exportHint": "In Anki choose File → Export, select “Anki Collection Package” or “Anki Deck Package” and enable scheduling information, deck presets and media — without deck presets Anki only exports its default options."
   },
   "options": {
     "title": "Deck Options",

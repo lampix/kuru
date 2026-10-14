@@ -6,6 +6,15 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+- Importing no longer duplicates the "Default" preset: Anki's built-in options group is merged into
+  Kuru's Default; existing duplicates are merged by a database migration.
+- Imports of collections from newer Anki versions failed on newer SQLite builds ("no query
+  solution") because Anki's `unicase` collation was not defined.
+
+### Changed
+- The import hint explains that Anki must export deck presets for options to carry over.
+
 ## [0.1.0] - 2026-10-14
 
 ### Added

@@ -50,9 +50,13 @@ from kuru.services.importer.reader import (
     AnkiReview,
     CollectionReader,
 )
+from kuru.services.presets import default_preset
 
 ProgressCallback = Callable[[str, float], None]
 BATCH_SIZE = 2000
+
+#: Id of Anki's built-in "Default" options group.
+ANKI_DEFAULT_PRESET_ID = 1
 
 # Anki queue values
 QUEUE_SUSPENDED = -1
@@ -163,8 +167,15 @@ class AnkiImporter:
                 )
             )
         }
+        # Anki's built-in options group always has id 1 (it cannot be deleted in Anki). It is the
+        # same concept as Kuru's Default preset, so it fills that preset instead of duplicating it.
+        if ANKI_DEFAULT_PRESET_ID not in existing:
+            kuru_default = default_preset(self.session, self.user)
+            if kuru_default.anki_id is None:
+                existing[ANKI_DEFAULT_PRESET_ID] = kuru_default
         for anki in presets:
             preset = existing.get(anki.id) or DeckConfig(user_id=self.user_id, anki_id=anki.id)
+            preset.anki_id = anki.id
             preset.name = anki.name[:200]
             preset.anki_mod, preset.anki_usn = anki.mod, anki.usn
             preset.new_per_day = max(0, anki.new_per_day)

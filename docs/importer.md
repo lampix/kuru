@@ -42,6 +42,14 @@ needs with a small wire-format reader (`services/importer/protobuf.py`); field n
 | revlog | `review_log` (rating = ease, kind = type, Anki ivl/lastIvl/factor kept) |
 | media | content-addressed blobs in `data/media/<sha256[:2]>/<sha256>` |
 
+### Presets
+
+Anki's built-in options group (*Default*, id 1, which Anki does not allow deleting) is merged into
+Kuru's own Default preset instead of being imported as a second "Default"; every other options group
+becomes its own preset. Exports only contain the user's presets when **"Include deck presets"** is
+enabled in Anki's export dialog — otherwise Anki writes just its stock Default (20 new / 200 reviews
+per day), and that is what gets imported.
+
 ### Scheduling state
 
 * **New** cards keep their position (`due`).
