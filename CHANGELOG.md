@@ -6,7 +6,7 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
-## [0.1.0] - 2026-10-13
+## [0.1.0] - 2026-10-14
 
 ### Added
 - FastAPI backend with SQLite (SQLModel, Alembic), single-user authentication with optional token.
@@ -19,3 +19,7 @@ All notable changes to this project are documented here. The format follows
   Serwist service worker), Anki template renderer with plugin hooks, review screen, import screen,
   deck options, card browser and statistics.
 - Docker images, docker-compose stack and GitHub Actions CI.
+- Proxmox VE LXC install script in the community-scripts.org format (`proxmox/`), updatable with
+  `update` inside the container.
+- Release workflow publishing prebuilt amd64/arm64 bundles for tags `vX.Y.Z`
+  (`scripts/build-release.sh`).

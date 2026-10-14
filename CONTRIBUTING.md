@@ -10,6 +10,7 @@ what we expect from contributions.
 | `backend/` | FastAPI service (Python, managed with [uv](https://docs.astral.sh/uv/)) |
 | `frontend/` | Next.js PWA (TypeScript, managed with [pnpm](https://pnpm.io/)) |
 | `docs/` | Architecture docs, ADRs and guides |
+| `proxmox/` | Proxmox VE LXC scripts (community-scripts.org format) |
 
 ## Prerequisites
 

@@ -48,3 +48,6 @@ data/
 # Playwright
 test-results/
 playwright-report/
+
+# Release bundles (scripts/build-release.sh)
+dist/

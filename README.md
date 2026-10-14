@@ -52,6 +52,18 @@ See [deployment](docs/deployment.md) for configuration, HTTPS and backups.
 
 > Service workers need a secure context: use `localhost` or serve Kuru over HTTPS.
 
+## Proxmox VE (LXC)
+
+Run on the Proxmox host to create a Debian container with Kuru, in the style of
+[community-scripts.org](https://community-scripts.org):
+
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/lampix/kuru/main/proxmox/ct/kuru.sh)"
+```
+
+Type `update` in the container's shell to install the latest release. See
+[deployment](docs/deployment.md#proxmox-ve-lxc).
+
 ## Development
 
 Requirements: Python ≥ 3.13 with [uv](https://docs.astral.sh/uv/), Node.js ≥ 22 with [pnpm](https://pnpm.io/).
