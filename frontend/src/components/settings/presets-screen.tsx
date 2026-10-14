@@ -4,10 +4,9 @@ import { Check, Plus } from "lucide-react";
 import { useLiveQuery } from "dexie-react-hooks";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
-  BarButton,
   InputRow,
   ListRow,
   ListSection,
@@ -15,6 +14,7 @@ import {
   SegmentedControl,
   StackedRow,
   SwitchRow,
+  useToast,
 } from "@/components/ios";
 import { useRouter } from "@/i18n/navigation";
 import { ApiError, api } from "@/lib/api/client";
@@ -39,6 +39,27 @@ const parseSteps = (text: string): number[] | null => {
   return values.every((v) => Number.isFinite(v) && v > 0) ? values : null;
 };
 const formatSteps = (steps: readonly number[]) => steps.join(" ");
+
+/** The editable fields of a preset (read-only ones are never sent back). */
+function toDraft(p: Preset): Draft {
+  return {
+    name: p.name,
+    desired_retention: p.desired_retention,
+    maximum_interval: p.maximum_interval,
+    fsrs_weights: p.fsrs_weights,
+    learning_steps: p.learning_steps,
+    relearning_steps: p.relearning_steps,
+    enable_fuzz: p.enable_fuzz,
+    new_per_day: p.new_per_day,
+    reviews_per_day: p.reviews_per_day,
+    new_card_order: p.new_card_order,
+    bury_new: p.bury_new,
+    bury_reviews: p.bury_reviews,
+    bury_interday_learning: p.bury_interday_learning,
+    autoplay_audio: p.autoplay_audio,
+    show_answer_timer: p.show_answer_timer,
+  };
+}
 
 /**
  * Deck options. `?deck=ID` shows the preset used by that deck (and lets you switch it);
@@ -87,38 +108,42 @@ export function PresetsScreen() {
 
   return (
     <PresetEditor
-      key={`${selected.id}:${selected.updated_at}`}
+      // Keyed by id only: auto-saves update `updated_at` and must not remount the form.
+      key={selected.id}
       preset={selected}
       presets={data.presets}
       deck={deck ? { id: deck.id, name: deck.name } : null}
-      onClose={() => router.back()}
+      onDeleted={() => router.replace("/settings/presets")}
     />
   );
 }
+
+const SAVE_DELAY_MS = 600;
 
 function PresetEditor({
   preset,
   presets,
   deck,
-  onClose,
+  onDeleted,
 }: {
   preset: Preset;
   presets: Preset[];
   deck: { id: number; name: string } | null;
-  onClose: () => void;
+  onDeleted: () => void;
 }) {
   const t = useTranslations("options");
-  const common = useTranslations("common");
+  const decksT = useTranslations("decks");
+  const settingsT = useTranslations("settings");
   const { phase } = useSyncStatus();
+  const { toast, show } = useToast();
   const offline = phase === "offline";
-  const [draft, setDraft] = useState<Draft>(() => ({ ...preset }));
+  const [draft, setDraft] = useState<Draft>(() => toDraft(preset));
   const [learning, setLearning] = useState(formatSteps(preset.learning_steps));
   const [relearning, setRelearning] = useState(formatSteps(preset.relearning_steps));
   const [weights, setWeights] = useState(
     preset.weights_are_default ? "" : preset.fsrs_weights.join(", "),
   );
   const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
 
   const set = <K extends keyof Draft>(key: K, value: Draft[K]) =>
     setDraft((d) => ({ ...d, [key]: value }));
@@ -136,34 +161,65 @@ function PresetEditor({
   const valid =
     learningSteps !== null && relearningSteps !== null && weightsValid && draft.name.trim() !== "";
 
-  const persist = async (updated: Preset) => {
-    await db.presets.put(updated);
-    void syncNow();
+  // ---- auto-save (iOS Settings style) ------------------------------------------------------
+  const payload: Partial<Preset> = {
+    ...draft,
+    name: draft.name.trim(),
+    learning_steps: learningSteps ?? [],
+    relearning_steps: relearningSteps ?? [],
+    fsrs_weights: weightValues,
   };
+  const payloadKey = JSON.stringify(payload);
+  const [savedKey, setSavedKey] = useState(payloadKey);
+  const pending = useRef<{ key: string; payload: Partial<Preset> } | null>(null);
+
+  const save = useCallback(
+    async (body: Partial<Preset>, key: string, quiet = false) => {
+      try {
+        const updated = await api.presets.update(preset.id, body);
+        setSavedKey(key);
+        await db.presets.put(updated);
+        void syncNow();
+        if (!quiet) show(t("saved"));
+      } catch (error) {
+        if (!quiet) show(error instanceof ApiError ? error.message : t("saveFailed"), "error");
+      }
+    },
+    [preset.id, show, t],
+  );
+
+  const dirty = valid && payloadKey !== savedKey;
+  useEffect(() => {
+    pending.current = dirty ? { key: payloadKey, payload } : null;
+    if (!dirty || offline) return;
+    const timer = setTimeout(() => {
+      pending.current = null;
+      void save(payload, payloadKey);
+    }, SAVE_DELAY_MS);
+    return () => clearTimeout(timer);
+    // `payload` is derived from `payloadKey`; depending on the key avoids a save per render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [payloadKey, dirty, offline, save]);
+
+  // Leaving the screen within the debounce window still saves the last change.
+  useEffect(
+    () => () => {
+      const last = pending.current;
+      if (last) void save(last.payload, last.key, true);
+    },
+    [save],
+  );
 
   const run = async (action: () => Promise<void>) => {
     setBusy(true);
-    setMessage(null);
     try {
       await action();
     } catch (error) {
-      setMessage(error instanceof ApiError ? error.message : String(error));
+      show(error instanceof ApiError ? error.message : String(error), "error");
     } finally {
       setBusy(false);
     }
   };
-
-  const save = () =>
-    run(async () => {
-      const updated = await api.presets.update(preset.id, {
-        ...draft,
-        learning_steps: learningSteps ?? [],
-        relearning_steps: relearningSteps ?? [],
-        fsrs_weights: weightValues,
-      });
-      await persist(updated);
-      setMessage(t("saved"));
-    });
 
   const choosePreset = (id: number) =>
     run(async () => {
@@ -171,6 +227,7 @@ function PresetEditor({
       await api.decks.update(deck.id, { config_id: id });
       await db.decks.update(deck.id, { config_id: id });
       void syncNow();
+      show(t("saved"));
     });
 
   const createPreset = () =>
@@ -182,14 +239,18 @@ function PresetEditor({
         await db.decks.update(deck.id, { config_id: created.id });
       }
       void syncNow();
+      show(t("saved"));
     });
 
   const optimize = () =>
     run(async () => {
-      setMessage(t("optimizing"));
+      show(t("optimizing"));
       const result = await api.presets.optimize(preset.id, true);
-      setWeights(result.weights.map((w) => w.toFixed(4)).join(", "));
-      setMessage(t("optimized", { count: result.review_count }));
+      const optimized = result.weights.map((w) => w.toFixed(4)).join(", ");
+      setWeights(optimized);
+      // Already stored by the server: mark as saved so auto-save does not resend it.
+      setSavedKey(JSON.stringify({ ...payload, fsrs_weights: optimized.split(", ").map(Number) }));
+      show(t("optimized", { count: result.review_count }));
       void syncNow();
     });
 
@@ -198,31 +259,24 @@ function PresetEditor({
       await api.presets.remove(preset.id);
       await db.presets.delete(preset.id);
       void syncNow();
-      onClose();
+      onDeleted();
     });
 
-  const number = (value: string, fallback: number) =>
-    value === "" || Number.isNaN(Number(value)) ? fallback : Number(value);
   const disabled = offline || busy;
 
   return (
     <NavigationPage
       title={deck ? deck.name.split("::").pop()! : t("title")}
       largeTitle={false}
-      leading={<BarButton onClick={onClose}>{common("cancel")}</BarButton>}
-      trailing={
-        <BarButton bold disabled={!valid || disabled} onClick={() => void save()}>
-          {common("save")}
-        </BarButton>
+      back={
+        deck
+          ? { href: "/", label: decksT("title") }
+          : { href: "/settings/presets", label: settingsT("presets") }
       }
     >
+      {toast}
       {offline ? (
         <p className="mt-3 px-4 text-footnote text-ios-orange">{t("onlineOnly")}</p>
-      ) : null}
-      {message ? (
-        <p className="mt-3 px-4 text-footnote text-label-2" role="status">
-          {message}
-        </p>
       ) : null}
 
       {deck ? (
@@ -254,28 +308,27 @@ function PresetEditor({
           value={draft.name}
           disabled={disabled}
           className="w-full"
+          aria-invalid={draft.name.trim() === ""}
           onChange={(e) => set("name", e.target.value)}
         />
       </ListSection>
 
       <ListSection header={t("dailyLimits")}>
-        <InputRow
+        <NumberRow
           title={t("newPerDay")}
-          type="number"
-          inputMode="numeric"
           min={0}
+          max={9999}
           disabled={disabled}
           value={draft.new_per_day}
-          onChange={(e) => set("new_per_day", number(e.target.value, 0))}
+          onValue={(v) => set("new_per_day", v)}
         />
-        <InputRow
+        <NumberRow
           title={t("reviewsPerDay")}
-          type="number"
-          inputMode="numeric"
           min={0}
+          max={99999}
           disabled={disabled}
           value={draft.reviews_per_day}
-          onChange={(e) => set("reviews_per_day", number(e.target.value, 0))}
+          onValue={(v) => set("reviews_per_day", v)}
         />
         <StackedRow title={t("newCardOrder")}>
           <SegmentedControl
@@ -308,27 +361,24 @@ function PresetEditor({
       </ListSection>
 
       <ListSection header={t("fsrs")} footer={t("weightsFooter")}>
-        <InputRow
+        <NumberRow
           title={t("desiredRetention")}
-          type="number"
           step={0.01}
           min={0.7}
           max={0.99}
+          decimal
           disabled={disabled}
           value={draft.desired_retention}
-          onChange={(e) =>
-            set("desired_retention", Math.min(0.99, Math.max(0.7, number(e.target.value, 0.9))))
-          }
+          onValue={(v) => set("desired_retention", v)}
         />
-        <InputRow
+        <NumberRow
           title={t("maximumInterval")}
-          type="number"
           min={1}
           max={36500}
           disabled={disabled}
           value={draft.maximum_interval}
           suffix={t("daysUnit")}
-          onChange={(e) => set("maximum_interval", number(e.target.value, 36500))}
+          onValue={(v) => set("maximum_interval", v)}
         />
         <SwitchRow
           title={t("fuzz")}
@@ -381,15 +431,14 @@ function PresetEditor({
           disabled={disabled}
           onCheckedChange={(v) => set("autoplay_audio", v)}
         />
-        <InputRow
+        <NumberRow
           title={t("showAnswerTimer")}
-          type="number"
           min={0}
           max={600}
           disabled={disabled}
           value={draft.show_answer_timer}
           suffix="s"
-          onChange={(e) => set("show_answer_timer", number(e.target.value, 0))}
+          onValue={(v) => set("show_answer_timer", v)}
         />
       </ListSection>
 
@@ -404,5 +453,58 @@ function PresetEditor({
         </ListSection>
       ) : null}
     </NavigationPage>
+  );
+}
+
+/**
+ * A number input that keeps its own text while typing (so clearing the field to type a new value
+ * does not snap it to 0) and only reports valid, in-range values.
+ */
+function NumberRow({
+  title,
+  value,
+  onValue,
+  min,
+  max,
+  step,
+  decimal,
+  suffix,
+  disabled,
+}: {
+  title: string;
+  value: number;
+  onValue: (value: number) => void;
+  min: number;
+  max: number;
+  step?: number;
+  decimal?: boolean;
+  suffix?: string;
+  disabled?: boolean;
+}) {
+  const [invalid, setInvalid] = useState(false);
+  return (
+    <InputRow
+      title={title}
+      type="number"
+      inputMode={decimal ? "decimal" : "numeric"}
+      min={min}
+      max={max}
+      step={step}
+      suffix={suffix}
+      disabled={disabled}
+      defaultValue={value}
+      aria-invalid={invalid}
+      onChange={(e) => {
+        const parsed = Number(e.target.value.replace(",", "."));
+        const ok =
+          e.target.value.trim() !== "" &&
+          Number.isFinite(parsed) &&
+          parsed >= min &&
+          parsed <= max &&
+          (decimal || Number.isInteger(parsed));
+        setInvalid(!ok);
+        if (ok) onValue(parsed);
+      }}
+    />
   );
 }

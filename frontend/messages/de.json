@@ -196,7 +196,8 @@
     "saved": "Gespeichert",
     "deletePreset": "Voreinstellung löschen",
     "onlineOnly": "Zum Ändern der Optionen ist eine Verbindung zum Server nötig.",
-    "daysUnit": "Tage"
+    "daysUnit": "Tage",
+    "saveFailed": "Speichern fehlgeschlagen"
   },
   "login": {
     "title": "Anmelden",

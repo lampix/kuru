@@ -13,6 +13,8 @@ All notable changes to this project are documented here. The format follows
   solution") because Anki's `unicase` collation was not defined.
 
 ### Changed
+- Deck options save automatically (iOS Settings style) with a "Saved" confirmation; the Cancel/Save
+  bar buttons are replaced by a back arrow. Number fields no longer snap to 0 while retyping.
 - The import hint explains that Anki must export deck presets for options to carry over.
 
 ## [0.1.0] - 2026-10-14

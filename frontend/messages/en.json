@@ -196,7 +196,8 @@
     "saved": "Saved",
     "deletePreset": "Delete Preset",
     "onlineOnly": "Changing options requires a connection to the server.",
-    "daysUnit": "days"
+    "daysUnit": "days",
+    "saveFailed": "Could not save"
   },
   "login": {
     "title": "Sign In",

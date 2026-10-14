@@ -176,7 +176,7 @@ export function InputRow({
         <span className="flex max-w-[50%] min-w-0 shrink-0 items-center justify-end gap-0.5">
           <input
             className={cn(
-              "w-20 min-w-0 bg-transparent text-right text-label-2 outline-none focus:text-label",
+              "w-20 min-w-0 bg-transparent text-right text-label-2 outline-none focus:text-label aria-invalid:text-ios-red",
               className,
             )}
             {...props}
