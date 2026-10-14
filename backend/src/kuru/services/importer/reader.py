@@ -114,6 +114,12 @@ class AnkiReview:
     type: int
 
 
+def unicase_collation(a: str, b: str) -> int:
+    """Case-insensitive Unicode comparison, equivalent to Anki's `unicase` collation."""
+    left, right = a.casefold(), b.casefold()
+    return (left > right) - (left < right)
+
+
 def _json(value: str | bytes | None) -> Any:
     if not value:
         return {}
@@ -128,6 +134,10 @@ class CollectionReader:
 
     def __init__(self, path: Path) -> None:
         self._db = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
+        # Anki declares name columns `COLLATE unicase` (a collation only Anki defines), also in
+        # WITHOUT ROWID tables and their indexes. Without it newer SQLite versions refuse such
+        # queries ("no query solution" / "no such collation sequence: unicase").
+        self._db.create_collation("unicase", unicase_collation)
         self._db.row_factory = sqlite3.Row
         row = self._db.execute("SELECT crt, ver, conf, models, decks, dconf FROM col").fetchone()
         if row is None:

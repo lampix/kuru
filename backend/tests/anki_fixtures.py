@@ -231,24 +231,40 @@ def build_schema11(path: Path) -> None:
     db.close()
 
 
+def _unicase(a: str, b: str) -> int:
+    """Stand-in for Anki's `unicase` collation (only Anki defines it)."""
+    return (a.casefold() > b.casefold()) - (a.casefold() < b.casefold())
+
+
 def build_schema18(path: Path) -> None:
     db = sqlite3.connect(path)
+    # Like real Anki collections, names use the custom `unicase` collation and some tables are
+    # WITHOUT ROWID with indexes over those columns. Readers must define the collation, otherwise
+    # newer SQLite versions fail with "no query solution" / "no such collation sequence".
+    db.create_collation("unicase", _unicase)
     db.executescript(_COMMON_TABLES)
     db.executescript("""
     CREATE TABLE config (KEY text not null primary key, usn integer not null,
       mtime_secs integer not null, val blob not null) without rowid;
-    CREATE TABLE deck_config (id integer primary key not null, name text not null,
+    CREATE TABLE deck_config (id integer primary key not null, name text not null collate unicase,
       mtime_secs integer not null, usn integer not null, config blob not null);
-    CREATE TABLE decks (id integer primary key not null, name text not null,
+    CREATE TABLE decks (id integer primary key not null, name text not null collate unicase,
       mtime_secs integer not null, usn integer not null, common blob not null,
       kind blob not null);
-    CREATE TABLE notetypes (id integer not null primary key, name text not null,
+    CREATE UNIQUE INDEX idx_decks_name ON decks (name);
+    CREATE TABLE notetypes (id integer not null primary key, name text not null collate unicase,
       mtime_secs integer not null, usn integer not null, config blob not null);
-    CREATE TABLE fields (ntid integer not null, ord integer not null, name text not null,
-      config blob not null, primary key (ntid, ord)) without rowid;
-    CREATE TABLE templates (ntid integer not null, ord integer not null, name text not null,
-      mtime_secs integer not null, usn integer not null, config blob not null,
+    CREATE UNIQUE INDEX idx_notetypes_name ON notetypes (name);
+    CREATE TABLE fields (ntid integer not null, ord integer not null,
+      name text not null collate unicase, config blob not null,
       primary key (ntid, ord)) without rowid;
+    CREATE UNIQUE INDEX idx_fields_name_ntid ON fields (name, ntid);
+    CREATE TABLE templates (ntid integer not null, ord integer not null,
+      name text not null collate unicase, mtime_secs integer not null, usn integer not null,
+      config blob not null, primary key (ntid, ord)) without rowid;
+    CREATE UNIQUE INDEX idx_templates_name_ntid ON templates (name, ntid);
+    CREATE TABLE tags (tag text not null primary key collate unicase, usn integer not null,
+      collapsed boolean not null, config blob null) without rowid;
     """)
     db.execute("INSERT INTO col VALUES (1,?,?,?,18,0,0,0,'','','','','')", (CRT, CRT, CRT))
     db.execute("INSERT INTO config VALUES ('fsrs', 0, ?, ?)", (CRT, b"true"))
