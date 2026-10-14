@@ -3,8 +3,7 @@
 import { useFormatter, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
-import { InputRow, ListRow, ListSection, SelectRow } from "@/components/ios";
-import { Dialog, DialogContent, DialogFooter, DialogTitle } from "@/components/ui/dialog";
+import { ConfirmDialog, InputRow, ListRow, ListSection, SelectRow } from "@/components/ios";
 import { useRouter } from "@/i18n/navigation";
 import { api } from "@/lib/api/client";
 import type { Me } from "@/lib/api/types";
@@ -40,7 +39,6 @@ export function SyncSettings() {
   };
 
   const clearLocal = async () => {
-    setConfirm(false);
     await db.delete();
     await db.open();
     void syncNow({ full: true });
@@ -126,27 +124,14 @@ export function SyncSettings() {
         ) : null}
       </ListSection>
 
-      <Dialog open={confirm} onOpenChange={setConfirm}>
-        <DialogContent
-          className="max-w-[280px] rounded-[14px] border-0 bg-grouped-2 p-0 text-center"
-          showCloseButton={false}
-        >
-          <DialogTitle className="px-4 pt-5 text-headline">{t("resetLocal")}</DialogTitle>
-          <p className="px-4 pb-4 text-footnote">{t("resetLocalConfirm")}</p>
-          <DialogFooter className="grid grid-cols-2 gap-0 hairline-t sm:flex-none">
-            <button type="button" className="py-3 text-tint" onClick={() => setConfirm(false)}>
-              {common("cancel")}
-            </button>
-            <button
-              type="button"
-              className="py-3 font-semibold text-ios-red"
-              onClick={() => void clearLocal()}
-            >
-              {common("delete")}
-            </button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ConfirmDialog
+        open={confirm}
+        onOpenChange={setConfirm}
+        title={t("resetLocal")}
+        message={t("resetLocalConfirm")}
+        confirmLabel={common("delete")}
+        onConfirm={() => void clearLocal()}
+      />
     </>
   );
 }

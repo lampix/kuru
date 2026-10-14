@@ -4,9 +4,8 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { useFormatter, useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 
-import { ListRow, ListSection } from "@/components/ios";
+import { ConfirmDialog, ListRow, ListSection } from "@/components/ios";
 import { CardView } from "@/components/review/card-view";
-import { Dialog, DialogContent, DialogFooter, DialogTitle } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { api } from "@/lib/api/client";
 import type { HistoryEntry } from "@/lib/api/types";
@@ -167,30 +166,14 @@ export function CardDetailSheet({
         ) : null}
       </SheetContent>
 
-      <Dialog open={confirmReset} onOpenChange={setConfirmReset}>
-        <DialogContent
-          className="max-w-[280px] rounded-[14px] border-0 bg-grouped-2 p-0 text-center"
-          showCloseButton={false}
-        >
-          <DialogTitle className="px-4 pt-5 text-headline">{t("forget")}</DialogTitle>
-          <p className="px-4 pb-4 text-footnote">{t("forgetConfirm")}</p>
-          <DialogFooter className="grid grid-cols-2 gap-0 hairline-t sm:flex-none">
-            <button type="button" className="py-3 text-tint" onClick={() => setConfirmReset(false)}>
-              {common("cancel")}
-            </button>
-            <button
-              type="button"
-              className="py-3 font-semibold text-ios-red"
-              onClick={() => {
-                setConfirmReset(false);
-                void act("forget");
-              }}
-            >
-              {t("forget")}
-            </button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ConfirmDialog
+        open={confirmReset}
+        onOpenChange={setConfirmReset}
+        title={t("forget")}
+        message={t("forgetConfirm")}
+        confirmLabel={t("forget")}
+        onConfirm={() => void act("forget")}
+      />
     </Sheet>
   );
 }

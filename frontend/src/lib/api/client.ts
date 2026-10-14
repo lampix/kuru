@@ -123,6 +123,7 @@ export const api = {
   },
 
   decks: {
+    remove: (id: number) => request<void>(`/decks/${id}`, { method: "DELETE" }),
     update: (
       id: number,
       body: { name?: string; description?: string; config_id?: number | null },

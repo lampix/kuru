@@ -41,7 +41,12 @@
     "cards": "{count, plural, one {# Karte} other {# Karten}}",
     "options": "Stapeloptionen",
     "study": "Lernen",
-    "allDone": "Für heute erledigt"
+    "allDone": "Für heute erledigt",
+    "delete": "Stapel löschen",
+    "deleteFooter": "Löscht den Stapel, seine Unterstapel und alle zugehörigen Karten.",
+    "deleteTitle": "„{name}“ löschen?",
+    "deleteMessage": "{cards, plural, =0 {Der Stapel ist leer.} one {# Karte wird samt Lernverlauf endgültig gelöscht.} other {# Karten werden samt Lernverlauf endgültig gelöscht.}} {subdecks, plural, =0 {} one {Das umfasst # Unterstapel.} other {Das umfasst # Unterstapel.}} Dies kann nicht rückgängig gemacht werden.",
+    "deleteConfirm": "Löschen"
   },
   "review": {
     "showAnswer": "Antwort zeigen",
@@ -197,7 +202,9 @@
     "deletePreset": "Voreinstellung löschen",
     "onlineOnly": "Zum Ändern der Optionen ist eine Verbindung zum Server nötig.",
     "daysUnit": "Tage",
-    "saveFailed": "Speichern fehlgeschlagen"
+    "saveFailed": "Speichern fehlgeschlagen",
+    "deletePresetTitle": "Voreinstellung „{name}“ löschen?",
+    "deletePresetMessage": "{count, plural, =0 {Kein Stapel verwendet diese Voreinstellung.} one {Der Stapel, der sie verwendet, wird auf „{fallback}“ umgestellt.} other {Die # Stapel, die sie verwenden, werden auf „{fallback}“ umgestellt.}}"
   },
   "login": {
     "title": "Anmelden",

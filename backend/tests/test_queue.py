@@ -211,3 +211,35 @@ def test_stats_and_history(client: TestClient, session: Session, user: User) -> 
     assert len(stats["activity"]) == 30 and len(stats["forecast"]) == 30
     history = client.get(f"/api/cards/{card.id}/history").json()
     assert [h["rating"] for h in history] == [1, 3]
+
+
+def test_delete_deck_removes_cards_history_and_orphaned_notes(
+    client: TestClient, session: Session, user: User
+) -> None:
+    from kuru.models import Card, Note, ReviewLog
+
+    only_here = make_card(session, user, deck_name="Kana::Hiragana")
+    shared = make_card(session, user, deck_name="Kana")
+    other = make_card(session, user, deck_name="Vocab")
+    assert only_here.id is not None and shared.id is not None and user.id is not None
+    # A second card of `shared`'s note lives in another deck: that note must survive.
+    sibling = Card(user_id=user.id, note_id=shared.note_id, deck_id=other.deck_id, ord=1)
+    session.add(sibling)
+    session.commit()
+    record_reviews(
+        session,
+        user,
+        [ReviewSubmission(id=str(uuid4()), card_id=only_here.id, rating=3, reviewed_at=utcnow())],
+    )
+    kana = session.exec(select(Deck).where(Deck.name == "Kana")).one()
+    orphan_note, shared_note = only_here.note_id, shared.note_id
+    survivors = {other.id, sibling.id}
+
+    assert client.delete(f"/api/decks/{kana.id}").status_code == 204
+
+    session.expire_all()
+    assert {d.name for d in session.exec(select(Deck))} == {"Vocab"}
+    assert {c.id for c in session.exec(select(Card))} == survivors
+    assert session.get(Note, orphan_note) is None  # orphaned note removed
+    assert session.get(Note, shared_note) is not None  # still has a card elsewhere
+    assert session.exec(select(ReviewLog)).all() == []  # history of deleted cards removed

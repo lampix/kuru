@@ -6,7 +6,12 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- "Delete Deck" at the bottom of a deck's options, with a confirmation that states how many cards
+  (and sub-decks) will be deleted permanently.
+
 ### Fixed
+- Deleting a deck also removes notes left without cards (as in Anki) and uses bulk deletes.
 - Importing no longer duplicates the "Default" preset: Anki's built-in options group is merged into
   Kuru's Default; existing duplicates are merged by a database migration.
 - Imports of collections from newer Anki versions failed on newer SQLite builds ("no query
@@ -16,6 +21,8 @@ All notable changes to this project are documented here. The format follows
 - Deck options save automatically (iOS Settings style) with a "Saved" confirmation; the Cancel/Save
   bar buttons are replaced by a back arrow. Number fields no longer snap to 0 while retyping.
 - The import hint explains that Anki must export deck presets for options to carry over.
+- Presets can only be deleted from the preset list (not from a deck's options) and always ask for
+  confirmation, naming the preset their decks switch to. The Default preset cannot be deleted.
 
 ## [0.1.0] - 2026-10-14
 

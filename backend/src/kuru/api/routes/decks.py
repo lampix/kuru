@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException, Response, status
+from sqlalchemy import delete
 from sqlmodel import col, select
 
 from kuru.api.deps import CurrentUser, SessionDep
 from kuru.api.serializers import note_types_for, study_cards
 from kuru.core.time import utcnow
-from kuru.models import Card, Deck, DeckConfig
+from kuru.models import Card, Deck, DeckConfig, Note
 from kuru.schemas.decks import (
     DeckCountsOut,
     DeckCreate,
@@ -133,15 +134,27 @@ def update_deck(deck_id: int, body: DeckUpdate, session: SessionDep, user: Curre
 
 @router.delete("/{deck_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_deck(deck_id: int, session: SessionDep, user: CurrentUser) -> Response:
-    """Delete a deck, its sub-decks and their cards."""
+    """Delete a deck with its sub-decks, their cards and review history.
+
+    Notes left without any card are deleted too (like in Anki); notes that still have cards in
+    other decks are kept. Presets are not affected.
+    """
     deck = _owned(session, user, deck_id)
     decks = session.exec(select(Deck).where(Deck.user_id == user.id)).all()
     ids = subtree_ids(decks, deck)
-    for card in session.exec(select(Card).where(col(Card.deck_id).in_(ids))):
-        session.delete(card)
-    for d in decks:
-        if d.id in ids:
-            session.delete(d)
+    note_ids = set(
+        session.exec(
+            select(Card.note_id).where(Card.user_id == user.id, col(Card.deck_id).in_(ids))
+        ).all()
+    )
+    # Bulk statements; the review log goes with its cards via ON DELETE CASCADE.
+    session.execute(delete(Card).where(col(Card.user_id) == user.id, col(Card.deck_id).in_(ids)))
+    if note_ids:
+        still_used = select(Card.note_id).where(col(Card.note_id).in_(note_ids))
+        session.execute(
+            delete(Note).where(col(Note.id).in_(note_ids), col(Note.id).not_in(still_used))
+        )
+    session.execute(delete(Deck).where(col(Deck.user_id) == user.id, col(Deck.id).in_(ids)))
     session.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 

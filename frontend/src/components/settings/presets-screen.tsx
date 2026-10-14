@@ -7,6 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import {
+  ConfirmDialog,
   InputRow,
   ListRow,
   ListSection,
@@ -18,9 +19,10 @@ import {
 } from "@/components/ios";
 import { useRouter } from "@/i18n/navigation";
 import { ApiError, api } from "@/lib/api/client";
-import type { Preset } from "@/lib/api/types";
+import type { Preset, SyncDeck } from "@/lib/api/types";
 import { db } from "@/lib/db";
 import { presetForDeck } from "@/lib/study/deck-tree";
+import { subtreeIds } from "@/lib/study/queue";
 import { syncNow } from "@/lib/sync/manager";
 import { useSyncStatus } from "@/lib/sync/hooks";
 
@@ -112,8 +114,10 @@ export function PresetsScreen() {
       key={selected.id}
       preset={selected}
       presets={data.presets}
-      deck={deck ? { id: deck.id, name: deck.name } : null}
-      onDeleted={() => router.replace("/settings/presets")}
+      deck={deck ?? null}
+      decks={data.decks}
+      onPresetDeleted={() => router.replace("/settings/presets")}
+      onDeckDeleted={() => router.replace("/")}
     />
   );
 }
@@ -124,12 +128,17 @@ function PresetEditor({
   preset,
   presets,
   deck,
-  onDeleted,
+  decks,
+  onPresetDeleted,
+  onDeckDeleted,
 }: {
   preset: Preset;
   presets: Preset[];
-  deck: { id: number; name: string } | null;
-  onDeleted: () => void;
+  /** Set when opened from a deck: the screen then shows deck actions instead of preset deletion. */
+  deck: SyncDeck | null;
+  decks: SyncDeck[];
+  onPresetDeleted: () => void;
+  onDeckDeleted: () => void;
 }) {
   const t = useTranslations("options");
   const decksT = useTranslations("decks");
@@ -254,12 +263,43 @@ function PresetEditor({
       void syncNow();
     });
 
-  const remove = () =>
+  // ---- destructive actions (always confirmed) ----------------------------------------------
+  const [confirmPreset, setConfirmPreset] = useState(false);
+  const [deckDeletion, setDeckDeletion] = useState<{ cards: number; subdecks: number } | null>(
+    null,
+  );
+  const fallbackPreset = presets.find((p) => p.is_default)?.name ?? "Default";
+
+  const removePreset = () =>
     run(async () => {
       await api.presets.remove(preset.id);
       await db.presets.delete(preset.id);
       void syncNow();
-      onDeleted();
+      onPresetDeleted();
+    });
+
+  const askDeleteDeck = async () => {
+    if (!deck) return;
+    const ids = [...subtreeIds(decks, deck)];
+    const cards = await db.cards.where("deck_id").anyOf(ids).count();
+    setDeckDeletion({ cards, subdecks: ids.length - 1 });
+  };
+
+  const removeDeck = () =>
+    run(async () => {
+      if (!deck) return;
+      await api.decks.remove(deck.id);
+      // Mirror the deletion locally right away instead of waiting for the next sync.
+      const ids = [...subtreeIds(decks, deck)];
+      await db.transaction("rw", [db.cards, db.decks, db.reviews, db.outbox], async () => {
+        const cardIds = await db.cards.where("deck_id").anyOf(ids).primaryKeys();
+        await db.cards.bulkDelete(cardIds);
+        await db.reviews.where("card_id").anyOf(cardIds).delete();
+        await db.outbox.where("card_id").anyOf(cardIds).delete();
+        await db.decks.bulkDelete(ids);
+      });
+      void syncNow();
+      onDeckDeleted();
     });
 
   const disabled = offline || busy;
@@ -442,16 +482,46 @@ function PresetEditor({
         />
       </ListSection>
 
-      {!preset.is_default ? (
+      {deck ? (
+        <ListSection footer={decksT("deleteFooter")}>
+          <ListRow
+            title={decksT("delete")}
+            destructive
+            disabled={disabled}
+            onClick={() => void askDeleteDeck()}
+          />
+        </ListSection>
+      ) : !preset.is_default ? (
+        // Presets are deleted from the preset list only; the Default preset never.
         <ListSection>
           <ListRow
             title={t("deletePreset")}
             destructive
             disabled={disabled}
-            onClick={() => void remove()}
+            onClick={() => setConfirmPreset(true)}
           />
         </ListSection>
       ) : null}
+
+      <ConfirmDialog
+        open={confirmPreset}
+        onOpenChange={setConfirmPreset}
+        title={t("deletePresetTitle", { name: preset.name })}
+        message={t("deletePresetMessage", { count: preset.deck_count, fallback: fallbackPreset })}
+        confirmLabel={decksT("deleteConfirm")}
+        onConfirm={() => void removePreset()}
+      />
+      <ConfirmDialog
+        open={deckDeletion !== null}
+        onOpenChange={(open) => !open && setDeckDeletion(null)}
+        title={decksT("deleteTitle", { name: deck?.name.split("::").pop() ?? "" })}
+        message={decksT("deleteMessage", {
+          cards: deckDeletion?.cards ?? 0,
+          subdecks: deckDeletion?.subdecks ?? 0,
+        })}
+        confirmLabel={decksT("deleteConfirm")}
+        onConfirm={() => void removeDeck()}
+      />
     </NavigationPage>
   );
 }

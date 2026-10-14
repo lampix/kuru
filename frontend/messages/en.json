@@ -41,7 +41,12 @@
     "cards": "{count, plural, one {# card} other {# cards}}",
     "options": "Deck Options",
     "study": "Study",
-    "allDone": "All done for today"
+    "allDone": "All done for today",
+    "delete": "Delete Deck",
+    "deleteFooter": "Deletes the deck, its sub-decks and all of their cards.",
+    "deleteTitle": "Delete “{name}”?",
+    "deleteMessage": "{cards, plural, =0 {The deck is empty.} one {# card and its review history will be deleted permanently.} other {# cards and their review history will be deleted permanently.}} {subdecks, plural, =0 {} one {This includes # sub-deck.} other {This includes # sub-decks.}} This cannot be undone.",
+    "deleteConfirm": "Delete"
   },
   "review": {
     "showAnswer": "Show Answer",
@@ -197,7 +202,9 @@
     "deletePreset": "Delete Preset",
     "onlineOnly": "Changing options requires a connection to the server.",
     "daysUnit": "days",
-    "saveFailed": "Could not save"
+    "saveFailed": "Could not save",
+    "deletePresetTitle": "Delete preset “{name}”?",
+    "deletePresetMessage": "{count, plural, =0 {No deck uses this preset.} one {The deck using it will switch to “{fallback}”.} other {The # decks using it will switch to “{fallback}”.}}"
   },
   "login": {
     "title": "Sign In",
