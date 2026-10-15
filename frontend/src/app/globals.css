@@ -184,6 +184,12 @@
     @apply bg-grouped text-body text-label antialiased;
     overscroll-behavior-y: none;
   }
+  /* Tailwind's preflight resets buttons to the default cursor; show that they are clickable. */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  summary {
+    cursor: pointer;
+  }
 }
 
 @utility pt-safe {

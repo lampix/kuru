@@ -224,15 +224,20 @@ export function StudyScreen() {
           >
             <Undo2 className="size-5" />
           </button>
-          <button
-            type="button"
-            onClick={() => setMenuOpen(true)}
-            disabled={!current}
-            aria-label={t("moreActions")}
-            className="flex size-8 items-center justify-center text-tint active:opacity-50 disabled:opacity-30"
-          >
-            <Ellipsis className="size-5" />
-          </button>
+          {session.mode === "practice" ? (
+            // Bury/suspend would change the card outside the practice session: not offered here.
+            <span className="size-8" aria-hidden />
+          ) : (
+            <button
+              type="button"
+              onClick={() => setMenuOpen(true)}
+              disabled={!current}
+              aria-label={t("moreActions")}
+              className="flex size-8 items-center justify-center text-tint active:opacity-50 disabled:opacity-30"
+            >
+              <Ellipsis className="size-5" />
+            </button>
+          )}
         </div>
       </header>
 

@@ -110,7 +110,8 @@ export function ListRow({
   );
   const classes = cn(
     "group/row flex w-full items-center gap-3",
-    interactive && "active:bg-fill-3 transition-colors",
+    // `hover:` only applies on devices that can hover (desktop), `active:` gives touch feedback.
+    interactive && "transition-colors hover:bg-fill-3/60 active:bg-fill-3",
     className,
   );
   if (href && !disabled) {

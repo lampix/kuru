@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { db, type LocalCard } from "@/lib/db";
+import type { LocalCard } from "@/lib/db";
 import { type Rating, Scheduler } from "@/lib/fsrs";
 
 import {
@@ -83,11 +83,10 @@ export function usePracticeSession(
     setNow(new Date());
   }, [history]);
 
-  // Bury / suspend are real actions: persist them and drop the card from the session.
+  // Practice never changes cards: dismissing only drops the card from this session.
   const dismissCurrent = useCallback(
-    async (patch: Partial<LocalCard>) => {
+    async (_patch: Partial<LocalCard>) => {
       if (!queue || !current) return;
-      await db.cards.put({ ...current, ...patch });
       setQueue(removePractice(queue, current.id));
       setShowing((n) => n + 1);
       setNow(new Date());

@@ -18,6 +18,9 @@ All notable changes to this project are documented here. The format follows
   since the last sync.
 
 ### Fixed
+- Clickable rows and buttons show a pointer cursor and a hover highlight on desktop.
+- Practice sessions no longer offer "Bury" / "Suspend", which would change the card outside the
+  session.
 - The "Source Code" row in Settings is clickable across its full width (it opens in a new tab),
   like the other rows.
 
