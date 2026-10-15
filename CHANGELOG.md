@@ -6,6 +6,13 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- French, Spanish and Italian translations. "System Default" picks them from the device language.
+
+### Changed
+- Settings: the language is chosen from an iOS-style pop-up menu (languages named in themselves);
+  the activity calendar starts weeks on Monday in every language except English.
+
 ## [0.3.0] - 2026-10-15
 
 ### Added

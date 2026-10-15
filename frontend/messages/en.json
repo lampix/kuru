@@ -146,8 +146,6 @@
     "general": "General",
     "language": "Language",
     "languageSystem": "System Default",
-    "languageEnglish": "English",
-    "languageGerman": "Deutsch",
     "languageFooter": "System Default follows your device language and falls back to English.",
     "collection": "Collection",
     "importTitle": "Import Anki Collection",

@@ -208,7 +208,7 @@ function YearHeatMap({
   const scroller = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState<string | null>(null);
   const { start, end } = yearRange(year);
-  const columns = weekColumns(start, end, locale === "de" ? 1 : 7);
+  const columns = weekColumns(start, end, locale === "en" ? 7 : 1);
   const byDay = new Map(days.map((a) => [a.day, a]));
   const max = Math.max(1, ...days.map((a) => a.reviews));
   const activeDay = active ? byDay.get(active) : undefined;

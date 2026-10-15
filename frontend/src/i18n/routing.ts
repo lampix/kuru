@@ -1,6 +1,6 @@
 import { defineRouting } from "next-intl/routing";
 
-export const locales = ["en", "de"] as const;
+export const locales = ["en", "de", "fr", "es", "it"] as const;
 export type AppLocale = (typeof locales)[number];
 
 /** Cookie holding a *manual* language override (set in Settings, absent for "System Default"). */

@@ -146,8 +146,6 @@
     "general": "Allgemein",
     "language": "Sprache",
     "languageSystem": "Systemstandard",
-    "languageEnglish": "English",
-    "languageGerman": "Deutsch",
     "languageFooter": "Der Systemstandard folgt der Gerätesprache und verwendet sonst Englisch.",
     "collection": "Sammlung",
     "importTitle": "Anki-Sammlung importieren",

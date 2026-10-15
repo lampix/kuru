@@ -2,6 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import de from "../../messages/de.json";
 import en from "../../messages/en.json";
+import es from "../../messages/es.json";
+import fr from "../../messages/fr.json";
+import it_ from "../../messages/it.json";
 import { resolveLocale } from "./detect";
 
 describe("resolveLocale", () => {
@@ -10,10 +13,13 @@ describe("resolveLocale", () => {
   });
   it("uses the system language", () => {
     expect(resolveLocale(null, ["de-AT", "en"])).toBe("de");
-    expect(resolveLocale(undefined, ["fr-FR", "de"])).toBe("de");
+    expect(resolveLocale(undefined, ["pt-BR", "de"])).toBe("de");
+    expect(resolveLocale(null, ["fr-CA"])).toBe("fr");
+    expect(resolveLocale(null, ["es-419"])).toBe("es");
+    expect(resolveLocale(null, ["it-IT"])).toBe("it");
   });
   it("falls back to English for unsupported languages", () => {
-    expect(resolveLocale(null, ["fr-FR", "ja"])).toBe("en");
+    expect(resolveLocale(null, ["pt-PT", "ja"])).toBe("en");
     expect(resolveLocale("xx", [])).toBe("en");
   });
 });
@@ -24,6 +30,8 @@ describe("message catalogues", () => {
       typeof v === "object" && v !== null ? keys(v, `${prefix}${k}.`) : [`${prefix}${k}`],
     );
   it("define the same keys in every locale", () => {
-    expect(keys(de).sort()).toEqual(keys(en).sort());
+    for (const catalogue of [de, fr, es, it_]) {
+      expect(keys(catalogue).sort()).toEqual(keys(en).sort());
+    }
   });
 });

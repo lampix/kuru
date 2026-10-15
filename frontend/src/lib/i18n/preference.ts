@@ -3,7 +3,7 @@
 import { useSyncExternalStore } from "react";
 
 import { LOCALE_OVERRIDE_COOKIE, type AppLocale } from "@/i18n/routing";
-import { resolveLocale } from "@/i18n/detect";
+import { isLocale, resolveLocale } from "@/i18n/detect";
 
 export type LanguagePreference = "system" | AppLocale;
 
@@ -14,7 +14,7 @@ const ONE_YEAR = 60 * 60 * 24 * 365;
 export function getLanguagePreference(): LanguagePreference {
   try {
     const value = localStorage.getItem(STORAGE_KEY);
-    return value === "en" || value === "de" ? value : "system";
+    return value && isLocale(value) ? value : "system";
   } catch {
     return "system";
   }

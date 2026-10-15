@@ -22,7 +22,9 @@ export default function RootPage() {
       <script dangerouslySetInnerHTML={{ __html: script }} />
       <noscript>
         <p style={{ padding: 24 }}>
-          <Link href="/en">English</Link> · <Link href="/de">Deutsch</Link>
+          <Link href="/en">English</Link> · <Link href="/de">Deutsch</Link> ·{" "}
+          <Link href="/fr">Français</Link> · <Link href="/es">Español</Link> ·{" "}
+          <Link href="/it">Italiano</Link>
         </p>
       </noscript>
     </>
