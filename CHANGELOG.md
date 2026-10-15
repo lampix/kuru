@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-10-15
+
 ### Fixed
 - Audio auto-play was sometimes cut off right away when the next card uses the same sound (e.g.
   the Hiragana and Katakana cards of one note): pre-buffering reset the playing audio.
