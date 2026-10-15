@@ -15,23 +15,28 @@ export class AudioPlayer {
   private sequence = 0;
 
   private element(name: string): HTMLAudioElement {
-    let audio = this.cache.get(name);
-    if (!audio) {
-      audio = new Audio(mediaUrl(name));
-      audio.preload = "auto";
-      this.cache.set(name, audio);
-      while (this.cache.size > MAX_CACHED) {
-        const oldest = this.cache.keys().next().value as string;
-        if (this.cache.get(oldest) === this.current) break;
-        this.cache.delete(oldest);
-      }
+    return this.cache.get(name) ?? this.create(name);
+  }
+
+  private create(name: string): HTMLAudioElement {
+    const audio = new Audio(mediaUrl(name));
+    audio.preload = "auto";
+    this.cache.set(name, audio);
+    while (this.cache.size > MAX_CACHED) {
+      const oldest = this.cache.keys().next().value as string;
+      if (this.cache.get(oldest) === this.current) break;
+      this.cache.delete(oldest);
     }
     return audio;
   }
 
-  /** Start downloading sounds that will be needed soon. */
+  /**
+   * Start downloading sounds that will be needed soon. Elements that already exist are left alone:
+   * `load()` resets an element and would cut off a sound that is playing right now (sibling cards
+   * often share their audio).
+   */
   preload(names: readonly string[]): void {
-    names.forEach((name) => this.element(name).load());
+    for (const name of names) if (!this.cache.has(name)) this.create(name).load();
   }
 
   /** Play sounds in order; a new call cancels the previous sequence. */

@@ -82,13 +82,14 @@ export function StudyScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only when the card changes
   }, [cardKey]);
 
+  const noteTypeOf = session.noteType;
   useEffect(() => {
     if (!next) return;
-    const noteType = session.noteType(next);
+    const noteType = noteTypeOf(next);
     if (!noteType) return;
     const upcoming = renderCard(noteType, next);
     audio.preload([...upcoming.questionSounds, ...upcoming.answerSounds]);
-  }, [next, session, audio]);
+  }, [next, noteTypeOf, audio]);
 
   useEffect(() => () => audio.stop(), [audio]);
 
