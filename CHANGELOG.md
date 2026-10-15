@@ -18,6 +18,8 @@ All notable changes to this project are documented here. The format follows
   since the last sync.
 
 ### Fixed
+- Study screen header buttons have tooltips (Close, Undo, More); the close button was announced as
+  "Congratulations!" to screen readers.
 - Clickable rows and buttons show a pointer cursor and a hover highlight on desktop.
 - Practice sessions no longer offer "Bury" / "Suspend", which would change the card outside the
   session.

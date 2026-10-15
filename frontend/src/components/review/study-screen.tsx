@@ -26,6 +26,7 @@ const PRACTICE_LABELS: Record<Rating, string> = { 1: "1m", 2: "10m", 3: "✓", 4
 
 export function StudyScreen() {
   const t = useTranslations("review");
+  const common = useTranslations("common");
   const format = useFormatter();
   const router = useRouter();
   const params = useSearchParams();
@@ -166,7 +167,8 @@ export function StudyScreen() {
             onClick={() =>
               router.push(deckId ? { pathname: "/deck", query: { deck: deckId } } : "/")
             }
-            aria-label={t("finished")}
+            aria-label={common("close")}
+            title={common("close")}
             className="flex size-8 items-center justify-center rounded-full bg-fill-3 text-label-2 active:opacity-50"
           >
             <X className="size-[18px]" strokeWidth={2.5} />
@@ -220,6 +222,7 @@ export function StudyScreen() {
             onClick={() => void session.undo()}
             disabled={!session.canUndo}
             aria-label={t("undo")}
+            title={t("undo")}
             className="flex size-8 items-center justify-center text-tint active:opacity-50 disabled:opacity-30"
           >
             <Undo2 className="size-5" />
@@ -233,6 +236,7 @@ export function StudyScreen() {
               onClick={() => setMenuOpen(true)}
               disabled={!current}
               aria-label={t("moreActions")}
+              title={t("moreActions")}
               className="flex size-8 items-center justify-center text-tint active:opacity-50 disabled:opacity-30"
             >
               <Ellipsis className="size-5" />
