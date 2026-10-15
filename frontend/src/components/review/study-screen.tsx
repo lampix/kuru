@@ -152,7 +152,9 @@ export function StudyScreen() {
         <div className="mx-auto flex h-12 max-w-2xl items-center gap-2 px-3">
           <button
             type="button"
-            onClick={() => router.push("/")}
+            onClick={() =>
+              router.push(deckParam > 0 ? { pathname: "/deck", query: { deck: deckParam } } : "/")
+            }
             aria-label={t("finished")}
             className="flex size-8 items-center justify-center rounded-full bg-fill-3 text-label-2 active:opacity-50"
           >
@@ -219,9 +221,9 @@ export function StudyScreen() {
 
       <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col overflow-hidden px-3 pt-2">
         {session.status === "ready" && !current ? (
-          <Finished nextDue={session.nextLearningDue} format={format} />
+          <Finished nextDue={session.nextLearningDue} format={format} deckId={deckParam} />
         ) : session.status === "missing" ? (
-          <Finished nextDue={null} format={format} />
+          <Finished nextDue={null} format={format} deckId={null} />
         ) : (
           <div className="relative flex-1 [perspective:1600px]">
             <AnimatePresence mode="popLayout" initial={false}>
@@ -307,9 +309,11 @@ export function StudyScreen() {
 function Finished({
   nextDue,
   format,
+  deckId,
 }: {
   nextDue: Date | null;
   format: ReturnType<typeof useFormatter>;
+  deckId: number | null;
 }) {
   const t = useTranslations("review");
   const decks = useTranslations("decks");
@@ -323,8 +327,11 @@ function Finished({
           {t("nextLearning", { time: format.relativeTime(nextDue, new Date()) })}
         </p>
       ) : null}
-      <Link href="/" className={cn(iosButton({ variant: "tinted" }), "mt-4")}>
-        {decks("title")}
+      <Link
+        href={deckId ? { pathname: "/deck", query: { deck: deckId } } : "/"}
+        className={cn(iosButton({ variant: "tinted" }), "mt-4")}
+      >
+        {deckId ? t("backToDeck") : decks("title")}
       </Link>
     </div>
   );

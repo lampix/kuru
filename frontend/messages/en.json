@@ -46,7 +46,8 @@
     "deleteFooter": "Deletes the deck, its sub-decks and all of their cards.",
     "deleteTitle": "Delete “{name}”?",
     "deleteMessage": "{cards, plural, =0 {The deck is empty.} one {# card and its review history will be deleted permanently.} other {# cards and their review history will be deleted permanently.}} {subdecks, plural, =0 {} one {This includes # sub-deck.} other {This includes # sub-decks.}} This cannot be undone.",
-    "deleteConfirm": "Delete"
+    "deleteConfirm": "Delete",
+    "subdecks": "Sub-decks"
   },
   "review": {
     "showAnswer": "Show Answer",
@@ -63,7 +64,8 @@
     "nextLearning": "The next learning card is due {time}.",
     "suspend": "Suspend Card",
     "bury": "Bury Card",
-    "moreActions": "More"
+    "moreActions": "More",
+    "backToDeck": "Back to Deck"
   },
   "browse": {
     "title": "Browse",

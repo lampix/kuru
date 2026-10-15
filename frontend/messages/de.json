@@ -46,7 +46,8 @@
     "deleteFooter": "Löscht den Stapel, seine Unterstapel und alle zugehörigen Karten.",
     "deleteTitle": "„{name}“ löschen?",
     "deleteMessage": "{cards, plural, =0 {Der Stapel ist leer.} one {# Karte wird samt Lernverlauf endgültig gelöscht.} other {# Karten werden samt Lernverlauf endgültig gelöscht.}} {subdecks, plural, =0 {} one {Das umfasst # Unterstapel.} other {Das umfasst # Unterstapel.}} Dies kann nicht rückgängig gemacht werden.",
-    "deleteConfirm": "Löschen"
+    "deleteConfirm": "Löschen",
+    "subdecks": "Unterstapel"
   },
   "review": {
     "showAnswer": "Antwort zeigen",
@@ -63,7 +64,8 @@
     "nextLearning": "Die nächste Lernkarte ist {time} fällig.",
     "suspend": "Karte aussetzen",
     "bury": "Karte zurückstellen",
-    "moreActions": "Mehr"
+    "moreActions": "Mehr",
+    "backToDeck": "Zurück zum Stapel"
   },
   "browse": {
     "title": "Durchsuchen",

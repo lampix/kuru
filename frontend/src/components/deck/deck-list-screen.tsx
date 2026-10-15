@@ -51,7 +51,7 @@ function DeckRow({ node, depth }: { node: DeckNode; depth: number }) {
             />
           </button>
           <Link
-            href={{ pathname: "/study", query: { deck: node.deck.id } }}
+            href={{ pathname: "/deck", query: { deck: node.deck.id } }}
             className="flex min-w-0 flex-1 items-center gap-3 py-3 active:opacity-50"
           >
             <span className="min-w-0 flex-1 truncate">{node.shortName}</span>
