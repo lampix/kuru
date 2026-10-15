@@ -32,11 +32,14 @@ export function BarChart({
   data,
   title,
   formatValue = (v) => String(v),
+  highlightKey,
   className,
 }: {
   data: readonly BarDatum[];
   title: string;
   formatValue?: (value: number) => string;
+  /** Key of a column to mark with a subtle backdrop (e.g. today). */
+  highlightKey?: string;
   className?: string;
 }) {
   const id = useId();
@@ -87,7 +90,14 @@ export function BarChart({
           const x = i * band + (band - barWidth) / 2;
           return (
             <g key={d.key}>
-              <rect x={i * band} y={TOP} width={band} height={plot} fill="transparent" />
+              <rect
+                x={i * band}
+                y={TOP}
+                width={band}
+                height={plot}
+                rx={d.key === highlightKey ? RADIUS : 0}
+                fill={d.key === highlightKey ? "var(--ios-fill-3)" : "transparent"}
+              />
               {d.value > 0 ? (
                 <path
                   d={columnPath(x, TOP + plot - h, barWidth, h)}

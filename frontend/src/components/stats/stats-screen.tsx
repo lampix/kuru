@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 
 import { BarChart, StatTile } from "@/components/charts/bar-chart";
 import { ListSection, NavigationPage, SelectRow } from "@/components/ios";
+import { ActivitySection } from "@/components/stats/activity-section";
 import { api } from "@/lib/api/client";
 import type { Stats } from "@/lib/api/types";
 import { db } from "@/lib/db";
@@ -102,19 +103,12 @@ export function StatsScreen() {
             <StatTile label={t("streak")} value={common("days", { count: stats.streak })} />
           </div>
 
-          <ListSection header={t("reviewsPerDay")} footer={t("last30Days")}>
-            <div className="px-4 pt-2 pb-3">
-              <BarChart
-                title={t("reviewsPerDay")}
-                data={stats.activity.map((a) => ({
-                  key: a.day,
-                  label: day(a.day),
-                  value: a.reviews,
-                  tooltip: `${day(a.day)}: ${format.number(a.reviews)} · ${minutes(a.duration_ms)} min`,
-                }))}
-              />
-            </div>
-          </ListSection>
+          <ActivitySection
+            deckId={deckId}
+            refreshKey={key}
+            today={stats.today.day}
+            recent={stats.activity}
+          />
 
           <ListSection header={t("forecast")} footer={t("forecastHint")}>
             <div className="px-4 pt-2 pb-3">

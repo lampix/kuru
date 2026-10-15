@@ -150,6 +150,12 @@ export interface Stats {
   streak: number;
 }
 
+export interface Activity {
+  /** The first study day with a review, or null without any reviews. */
+  first_day: string | null;
+  days: DayActivity[];
+}
+
 export interface HistoryEntry {
   id: string;
   rating: number;

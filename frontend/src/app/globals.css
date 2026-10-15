@@ -43,6 +43,10 @@
   --ios-teal: #30b0c7;
   --ios-gray: #8e8e93;
 
+  /* Activity heat map: empty day → --ios-blue (mid) → mixed towards the peak colour */
+  --heat-empty: #ffffff;
+  --heat-peak: #000000;
+
   /* shadcn/ui mapping */
   --background: var(--ios-grouped-bg);
   --foreground: var(--ios-label);
@@ -91,6 +95,9 @@
     --ios-indigo: #5e5ce6;
     --ios-teal: #40c8e0;
     --ios-gray: #8e8e93;
+
+    --heat-empty: #2c2c2e;
+    --heat-peak: #ffffff;
   }
 }
 

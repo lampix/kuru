@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import date, timedelta
 from uuid import uuid4
 
 from fastapi.testclient import TestClient
@@ -209,6 +209,14 @@ def test_stats_and_history(client: TestClient, session: Session, user: User) -> 
     assert stats["streak"] == 1
     assert stats["card_counts"]["new"] == 1
     assert len(stats["activity"]) == 30 and len(stats["forecast"]) == 30
+    today = stats["today"]["day"]
+    activity = client.get(f"/api/stats/activity?start=2020-01-01&end={today}")
+    assert activity.status_code == 422  # range too long
+    start = (date.fromisoformat(today) - timedelta(days=364)).isoformat()
+    activity = client.get(f"/api/stats/activity?start={start}&end={today}").json()
+    assert activity["first_day"] == today
+    assert len(activity["days"]) == 365
+    assert activity["days"][-1]["reviews"] == 2 and activity["days"][0]["reviews"] == 0
     history = client.get(f"/api/cards/{card.id}/history").json()
     assert [h["rating"] for h in history] == [1, 3]
 

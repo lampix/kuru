@@ -113,7 +113,16 @@
     "streak": "Streak",
     "offlineHint": "Statistics require a connection to the server.",
     "last30Days": "Last 30 days",
-    "next30Days": "Next 30 days"
+    "next30Days": "Next 30 days",
+    "viewYear": "Year",
+    "viewMonth": "Month",
+    "viewRecent": "30 Days",
+    "period": "Period",
+    "previous": "Previous",
+    "next": "Next",
+    "less": "Less",
+    "more": "More",
+    "periodSummary": "{reviews, plural, one {# review} other {# reviews}} on {days, plural, one {# day} other {# days}}"
   },
   "settings": {
     "title": "Settings",

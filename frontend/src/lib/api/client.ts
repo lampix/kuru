@@ -1,6 +1,7 @@
 /** Minimal typed fetch wrapper for the Kuru API (same origin via the `/api` rewrite). */
 
 import type {
+  Activity,
   CardMemory,
   HistoryEntry,
   ImportJob,
@@ -131,6 +132,8 @@ export const api = {
   },
 
   stats: (deckId?: number | null) => request<Stats>(`/stats${query({ deck_id: deckId ?? null })}`),
+  statsActivity: (start: string, end: string, deckId?: number | null) =>
+    request<Activity>(`/stats/activity${query({ start, end, deck_id: deckId ?? null })}`),
   cardHistory: (cardId: number) => request<HistoryEntry[]>(`/cards/${cardId}/history`),
 
   imports: {

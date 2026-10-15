@@ -6,9 +6,9 @@ from collections import Counter
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 
-from sqlmodel import Session, col, select
+from sqlmodel import Session, col, func, select
 
-from kuru.core.time import study_day
+from kuru.core.time import day_start, study_day
 from kuru.models import Card, CardState, Deck, ReviewKind, ReviewLog, User
 from kuru.services.fsrs import FsrsEngine, MemoryState
 from kuru.services.presets import preset_for_deck
@@ -47,6 +47,59 @@ def _bucket_label(index: int) -> str:
     if index == len(STABILITY_BUCKETS):
         return f"{STABILITY_BUCKETS[-1]}+"
     return f"{low}-{STABILITY_BUCKETS[index]}"
+
+
+MAX_ACTIVITY_DAYS = 400
+
+
+@dataclass(slots=True)
+class Activity:
+    first_day: date | None
+    days: list[DayActivity]
+
+
+def _scoped_card_ids(session: Session, user: User, deck: Deck | None) -> list[int | None]:
+    query = select(Card.id).where(Card.user_id == user.id)
+    if deck is not None:
+        decks = session.exec(select(Deck).where(Deck.user_id == user.id)).all()
+        query = query.where(col(Card.deck_id).in_(subtree_ids(decks, deck)))
+    return list(session.exec(query))
+
+
+def compute_activity(
+    session: Session, user: User, start: date, end: date, deck: Deck | None = None
+) -> Activity:
+    """Reviews per study day from ``start`` to ``end`` (inclusive), plus the first study day."""
+    tz, rollover = user.timezone, user.day_rollover_hour
+    card_ids = _scoped_card_ids(session, user, deck)
+    scope = (
+        ReviewLog.user_id == user.id,
+        col(ReviewLog.card_id).in_(card_ids),
+        col(ReviewLog.rating) > 0,
+    )
+    days = {
+        start + timedelta(days=i): DayActivity(start + timedelta(days=i))
+        for i in range((end - start).days + 1)
+    }
+    logs = session.exec(
+        select(ReviewLog).where(
+            *scope,
+            col(ReviewLog.reviewed_at) >= day_start(start, tz, rollover),
+            col(ReviewLog.reviewed_at) < day_start(end + timedelta(days=1), tz, rollover),
+        )
+    )
+    for log in logs:
+        bucket = days.get(study_day(log.reviewed_at, tz, rollover))
+        if bucket is not None:
+            bucket.reviews += 1
+            bucket.again += log.rating == 1
+            bucket.new += is_new_card_review(log)
+            bucket.duration_ms += log.duration_ms or 0
+    first = session.exec(select(func.min(ReviewLog.reviewed_at)).where(*scope)).one()
+    return Activity(
+        first_day=study_day(first, tz, rollover) if first is not None else None,
+        days=sorted(days.values(), key=lambda a: a.day),
+    )
 
 
 def compute_stats(

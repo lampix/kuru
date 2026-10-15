@@ -11,7 +11,7 @@ from sqlmodel import col, select
 from kuru.api.deps import CurrentUser, SessionDep
 from kuru.core.time import utcnow
 from kuru.models import Card, Deck, ReviewLog
-from kuru.services.stats import compute_stats
+from kuru.services.stats import MAX_ACTIVITY_DAYS, compute_activity, compute_stats
 
 router = APIRouter(tags=["stats"])
 
@@ -48,6 +48,11 @@ class StatsOut(BaseModel):
     streak: int
 
 
+class ActivityOut(BaseModel):
+    first_day: date | None
+    days: list[DayActivityOut]
+
+
 class HistoryEntry(BaseModel):
     id: str
     rating: int
@@ -57,15 +62,19 @@ class HistoryEntry(BaseModel):
     duration_ms: int | None
 
 
+def _deck(session: SessionDep, user: CurrentUser, deck_id: int | None) -> Deck | None:
+    if deck_id is None:
+        return None
+    deck = session.get(Deck, deck_id)
+    if deck is None or deck.user_id != user.id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Deck not found")
+    return deck
+
+
 @router.get("/stats")
 def stats(session: SessionDep, user: CurrentUser, deck_id: int | None = None) -> StatsOut:
     """Statistics for the collection, or for a deck including its sub-decks."""
-    deck = None
-    if deck_id is not None:
-        deck = session.get(Deck, deck_id)
-        if deck is None or deck.user_id != user.id:
-            raise HTTPException(status.HTTP_404_NOT_FOUND, "Deck not found")
-    result = compute_stats(session, user, utcnow(), deck)
+    result = compute_stats(session, user, utcnow(), _deck(session, user, deck_id))
     return StatsOut(
         today=DayActivityOut.model_validate(result.today, from_attributes=True),
         activity=[DayActivityOut.model_validate(a, from_attributes=True) for a in result.activity],
@@ -78,6 +87,20 @@ def stats(session: SessionDep, user: CurrentUser, deck_id: int | None = None) ->
         average_retrievability=result.average_retrievability,
         total_reviews=result.total_reviews,
         streak=result.streak,
+    )
+
+
+@router.get("/stats/activity")
+def activity(
+    start: date, end: date, session: SessionDep, user: CurrentUser, deck_id: int | None = None
+) -> ActivityOut:
+    """Reviews per study day in a date range (at most a bit over a year)."""
+    if end < start or (end - start).days >= MAX_ACTIVITY_DAYS:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "Invalid date range")
+    result = compute_activity(session, user, start, end, _deck(session, user, deck_id))
+    return ActivityOut(
+        first_day=result.first_day,
+        days=[DayActivityOut.model_validate(a, from_attributes=True) for a in result.days],
     )
 
 

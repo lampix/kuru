@@ -113,7 +113,16 @@
     "streak": "Serie",
     "offlineHint": "Für die Statistik ist eine Verbindung zum Server nötig.",
     "last30Days": "Letzte 30 Tage",
-    "next30Days": "Nächste 30 Tage"
+    "next30Days": "Nächste 30 Tage",
+    "viewYear": "Jahr",
+    "viewMonth": "Monat",
+    "viewRecent": "30 Tage",
+    "period": "Zeitraum",
+    "previous": "Zurück",
+    "next": "Weiter",
+    "less": "Weniger",
+    "more": "Mehr",
+    "periodSummary": "{reviews, plural, one {# Wiederholung} other {# Wiederholungen}} an {days, plural, one {# Tag} other {# Tagen}}"
   },
   "settings": {
     "title": "Einstellungen",
