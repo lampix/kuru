@@ -122,7 +122,12 @@
     "next": "Next",
     "less": "Less",
     "more": "More",
-    "periodSummary": "{reviews, plural, one {# review} other {# reviews}} on {days, plural, one {# day} other {# days}}"
+    "periodSummary": "{reviews, plural, one {# review} other {# reviews}} on {days, plural, one {# day} other {# days}}",
+    "explain": "Explanation",
+    "cardCount": "{count, plural, one {# card} other {# cards}}",
+    "difficultyLevel": "Difficulty {level}",
+    "stabilityInfo": "Stability is how long a card stays in your memory: the time until your chance of recalling it drops to 90 %. Each bar counts the cards up to the stability shown below it. The further right your cards sit, the more firmly you know them and the longer the gaps between their reviews. Average retrievability is the estimated chance that you would remember a review card right now.",
+    "difficultyInfo": "Difficulty is how hard a card is for you, from 1 (easy) to 10 (hard), estimated by FSRS from your answers: “Again” and “Hard” raise it, “Easy” lowers it. Harder cards get shorter intervals, so many cards on the right point at material worth reworking."
   },
   "settings": {
     "title": "Settings",

@@ -122,7 +122,12 @@
     "next": "Weiter",
     "less": "Weniger",
     "more": "Mehr",
-    "periodSummary": "{reviews, plural, one {# Wiederholung} other {# Wiederholungen}} an {days, plural, one {# Tag} other {# Tagen}}"
+    "periodSummary": "{reviews, plural, one {# Wiederholung} other {# Wiederholungen}} an {days, plural, one {# Tag} other {# Tagen}}",
+    "explain": "Erklärung",
+    "cardCount": "{count, plural, one {# Karte} other {# Karten}}",
+    "difficultyLevel": "Schwierigkeit {level}",
+    "stabilityInfo": "Die Stabilität gibt an, wie lange eine Karte im Gedächtnis bleibt: die Zeit, bis die Wahrscheinlichkeit, sie noch zu wissen, auf 90 % sinkt. Jeder Balken zählt die Karten bis zur darunter angegebenen Stabilität. Je weiter rechts deine Karten liegen, desto sicherer sitzt das Wissen und desto größer werden die Abstände zwischen den Wiederholungen. Die durchschnittliche Abrufbarkeit ist die geschätzte Wahrscheinlichkeit, dass du eine Wiederholungskarte gerade jetzt weißt.",
+    "difficultyInfo": "Die Schwierigkeit gibt an, wie schwer dir eine Karte fällt, von 1 (leicht) bis 10 (schwer). FSRS schätzt sie aus deinen Antworten: „Nochmal“ und „Schwer“ erhöhen sie, „Einfach“ senkt sie. Schwere Karten bekommen kürzere Intervalle – viele Karten rechts deuten auf Stoff hin, den du überarbeiten solltest."
   },
   "settings": {
     "title": "Einstellungen",

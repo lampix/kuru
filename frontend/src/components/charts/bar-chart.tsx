@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 export interface BarDatum {
   key: string;
-  /** Short axis label (only first/last are drawn). */
+  /** Short axis label (only first/last are drawn unless `axis` is "all"). */
   label: string;
   value: number;
   /** Tooltip text; defaults to "label: value". */
@@ -33,6 +33,7 @@ export function BarChart({
   title,
   formatValue = (v) => String(v),
   highlightKey,
+  axis = "ends",
   className,
 }: {
   data: readonly BarDatum[];
@@ -40,6 +41,8 @@ export function BarChart({
   formatValue?: (value: number) => string;
   /** Key of a column to mark with a subtle backdrop (e.g. today). */
   highlightKey?: string;
+  /** "ends" labels the first and last column (time series); "all" labels every column. */
+  axis?: "ends" | "all";
   className?: string;
 }) {
   const id = useId();
@@ -108,7 +111,19 @@ export function BarChart({
             </g>
           );
         })}
-        {data.length ? (
+        {axis === "all" ? (
+          data.map((d, i) => (
+            <text
+              key={d.key}
+              x={(i + 0.5) * band}
+              y={HEIGHT - 4}
+              textAnchor="middle"
+              className="fill-label-2 text-[10px]"
+            >
+              {d.label}
+            </text>
+          ))
+        ) : data.length ? (
           <>
             <text x={0} y={HEIGHT - 4} className="fill-label-2 text-[10px]">
               {data[0]!.label}

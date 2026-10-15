@@ -1,9 +1,9 @@
 "use client";
 
 import { useLiveQuery } from "dexie-react-hooks";
-import { CloudOff } from "lucide-react";
-import { useFormatter, useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { CloudOff, Info } from "lucide-react";
+import { useFormatter, useLocale, useTranslations } from "next-intl";
+import { useEffect, useId, useState } from "react";
 
 import { BarChart, StatTile } from "@/components/charts/bar-chart";
 import { ListSection, NavigationPage, SelectRow } from "@/components/ios";
@@ -11,6 +11,7 @@ import { ActivitySection } from "@/components/stats/activity-section";
 import { api } from "@/lib/api/client";
 import type { Stats } from "@/lib/api/types";
 import { db } from "@/lib/db";
+import { bucketAxisLabel, bucketRangeLabel } from "@/lib/stats/duration";
 import { useSyncStatus } from "@/lib/sync/hooks";
 
 const STATE_DOT: Record<string, string> = {
@@ -34,6 +35,7 @@ export function StatsScreen() {
   const browse = useTranslations("browse");
   const common = useTranslations("common");
   const format = useFormatter();
+  const locale = useLocale();
   const decks = useLiveQuery(() => db.decks.orderBy("name").toArray(), []);
   const { lastSync } = useSyncStatus();
   const [deckId, setDeckId] = useState<number | null>(null);
@@ -141,39 +143,85 @@ export function StatsScreen() {
             ))}
           </ListSection>
 
-          <ListSection
-            header={t("stability")}
+          <ExplainedSection
+            title={t("stability")}
+            explanation={t("stabilityInfo")}
             footer={`${t("averageRetrievability")}: ${percent(stats.average_retrievability)}`}
           >
-            <div className="px-4 pt-2 pb-3">
-              <BarChart
-                title={t("stability")}
-                data={stats.stability.map((b) => ({
-                  key: b.label,
-                  label: `${b.label} d`,
-                  value: b.count,
-                }))}
-              />
-            </div>
-          </ListSection>
+            <BarChart
+              title={t("stability")}
+              axis="all"
+              data={stats.stability.map((b) => ({
+                key: b.label,
+                label: bucketAxisLabel(b.label, locale),
+                value: b.count,
+                tooltip: `${bucketRangeLabel(b.label, locale)}: ${t("cardCount", { count: b.count })}`,
+              }))}
+            />
+          </ExplainedSection>
 
-          <ListSection
-            header={t("difficulty")}
+          <ExplainedSection
+            title={t("difficulty")}
+            explanation={t("difficultyInfo")}
             footer={`${t("totalReviews")}: ${format.number(stats.total_reviews)}`}
           >
-            <div className="px-4 pt-2 pb-3">
-              <BarChart
-                title={t("difficulty")}
-                data={stats.difficulty.map((b) => ({
-                  key: b.label,
-                  label: b.label,
-                  value: b.count,
-                }))}
-              />
-            </div>
-          </ListSection>
+            <BarChart
+              title={t("difficulty")}
+              axis="all"
+              data={stats.difficulty.map((b) => ({
+                key: b.label,
+                label: b.label,
+                value: b.count,
+                tooltip: `${t("difficultyLevel", { level: b.label })}: ${t("cardCount", { count: b.count })}`,
+              }))}
+            />
+          </ExplainedSection>
         </>
       )}
     </NavigationPage>
+  );
+}
+
+/** A chart section whose header carries an info button that reveals what the chart means. */
+function ExplainedSection({
+  title,
+  explanation,
+  footer,
+  children,
+}: {
+  title: string;
+  explanation: string;
+  footer: string;
+  children: React.ReactNode;
+}) {
+  const t = useTranslations("stats");
+  const id = useId();
+  const [open, setOpen] = useState(false);
+  return (
+    <ListSection
+      header={
+        <span className="flex items-center justify-between">
+          {title}
+          <button
+            type="button"
+            aria-label={t("explain")}
+            aria-expanded={open}
+            aria-controls={id}
+            onClick={() => setOpen((o) => !o)}
+            className="-my-3 -mr-3 flex size-11 items-center justify-center text-tint"
+          >
+            <Info className="size-[18px]" strokeWidth={2} aria-hidden />
+          </button>
+        </span>
+      }
+      footer={footer}
+    >
+      {open ? (
+        <p id={id} className="px-4 pt-3 text-footnote text-label-2">
+          {explanation}
+        </p>
+      ) : null}
+      <div className="px-4 pt-2 pb-3">{children}</div>
+    </ListSection>
   );
 }
