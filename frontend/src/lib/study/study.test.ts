@@ -202,3 +202,25 @@ describe("answers and outbox", () => {
     expect(await undoLocal(db, second)).toBe(false); // already synced
   });
 });
+
+describe("review sync window", () => {
+  const now = new Date("2026-10-15T12:00:00Z");
+  const dayStart = new Date("2026-10-15T02:00:00Z");
+  const days = (d: Date) => Math.round((now.getTime() - d.getTime()) / 86_400_000);
+
+  it("fetches 30 days on the first sync", async () => {
+    const { reviewWindow } = await import("@/lib/sync/engine");
+    const w = reviewWindow(now, dayStart, null);
+    expect(days(w.since)).toBe(30);
+    expect(days(w.keepFrom)).toBe(30);
+  });
+
+  it("covers the gap since the last sync, at least the previous study day", async () => {
+    const { reviewWindow } = await import("@/lib/sync/engine");
+    expect(days(reviewWindow(now, dayStart, "2026-10-10T12:00:00Z").since)).toBe(6);
+    expect(reviewWindow(now, dayStart, "2026-10-15T11:00:00Z").since.toISOString()).toBe(
+      "2026-10-14T02:00:00.000Z",
+    );
+    expect(days(reviewWindow(now, dayStart, "2026-01-01T00:00:00Z").since)).toBe(30);
+  });
+});

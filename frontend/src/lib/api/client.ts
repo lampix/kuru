@@ -95,7 +95,8 @@ export const api = {
     cards: (params: { since?: string | null; after_id?: number; limit?: number }) =>
       request<{ cards: StudyCard[]; next_after_id: number | null }>(`/sync/cards${query(params)}`),
     cardIds: () => request<{ card_ids: number[] }>("/sync/card-ids"),
-    reviews: (since: string) => request<RecentReview[]>(`/sync/reviews${query({ since })}`),
+    reviews: (since: string) =>
+      request<RecentReview[]>(`/sync/reviews${query({ since, limit: 20000 })}`),
     media: () => request<MediaEntry[]>("/sync/media"),
   },
 

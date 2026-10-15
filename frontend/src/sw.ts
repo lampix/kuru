@@ -40,7 +40,15 @@ const serwist = new Serwist({
   precacheEntries: self.__SW_MANIFEST,
   // Pages take their ids from the query string (e.g. /en/study?deck=1); match the cached shell.
   precacheOptions: {
-    ignoreURLParametersMatching: [/^deck$/, /^preset$/, /^card$/, /^q$/, /^utm_/],
+    ignoreURLParametersMatching: [
+      /^deck$/,
+      /^preset$/,
+      /^card$/,
+      /^q$/,
+      /^custom$/,
+      /^days$/,
+      /^utm_/,
+    ],
   },
   skipWaiting: true,
   clientsClaim: true,

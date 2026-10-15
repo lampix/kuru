@@ -47,7 +47,14 @@
     "deleteTitle": "Delete “{name}”?",
     "deleteMessage": "{cards, plural, =0 {The deck is empty.} one {# card and its review history will be deleted permanently.} other {# cards and their review history will be deleted permanently.}} {subdecks, plural, =0 {} one {This includes # sub-deck.} other {This includes # sub-decks.}} This cannot be undone.",
     "deleteConfirm": "Delete",
-    "subdecks": "Sub-decks"
+    "subdecks": "Sub-decks",
+    "customStudy": "Custom Study",
+    "customStudyFooter": "Practice sessions don't change due dates, daily limits or statistics.",
+    "forgotten": "Review Forgotten Cards",
+    "forgottenWithin": "{count, plural, one {Forgotten in the last day} other {Forgotten in the last # days}}",
+    "fewerDays": "Fewer days",
+    "moreDays": "More days",
+    "startPractice": "Start Practice"
   },
   "review": {
     "showAnswer": "Show Answer",
@@ -65,7 +72,10 @@
     "suspend": "Suspend Card",
     "bury": "Bury Card",
     "moreActions": "More",
-    "backToDeck": "Back to Deck"
+    "backToDeck": "Back to Deck",
+    "practiceCount": "Practice · {count}",
+    "practiceDone": "Practice complete",
+    "practiceDoneHint": "Due dates and statistics are unchanged."
   },
   "browse": {
     "title": "Browse",

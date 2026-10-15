@@ -13,6 +13,7 @@ import { api } from "@/lib/api/client";
 import { AudioPlayer } from "@/lib/audio";
 import { CardState, type Rating } from "@/lib/fsrs";
 import { renderCard } from "@/lib/render";
+import { usePracticeSession } from "@/lib/study/use-practice-session";
 import { useStudySession } from "@/lib/study/use-study-session";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +21,8 @@ import { AnswerButtons } from "./answer-buttons";
 import { CardView } from "./card-view";
 
 const RATING_KEYS: Record<string, Rating> = { "1": 1, "2": 2, "3": 3, "4": 4 };
+/** Practice: Again/Hard come back in the session, Good/Easy finish the card (see practice.ts). */
+const PRACTICE_LABELS: Record<Rating, string> = { 1: "1m", 2: "10m", 3: "✓", 4: "✓" };
 
 export function StudyScreen() {
   const t = useTranslations("review");
@@ -27,10 +30,18 @@ export function StudyScreen() {
   const router = useRouter();
   const params = useSearchParams();
   const deckParam = Number(params.get("deck"));
-  const session = useStudySession(Number.isFinite(deckParam) && deckParam > 0 ? deckParam : null);
+  const deckId = Number.isFinite(deckParam) && deckParam > 0 ? deckParam : null;
+  // `?custom=forgotten&days=N` starts a practice session (custom study) instead of the daily queue.
+  const practice = params.get("custom") === "forgotten";
+  const days = Math.min(30, Math.max(1, Number(params.get("days")) || 1));
+  // Both hooks always run (rules of hooks); the inactive one gets no deck and stays idle.
+  const regular = useStudySession(practice ? null : deckId);
+  const practiceSession = usePracticeSession(practice ? deckId : null, "forgotten", days);
+  const session = practice ? practiceSession : regular;
   const { current, next, preset, scheduler } = session;
 
-  const cardKey = current ? `${current.id}:${current.reps}` : null;
+  // `showing` makes a card that comes back in the same session start unrevealed again.
+  const cardKey = current ? `${current.id}:${current.reps}:${session.showing}` : null;
   // Per-card UI state is keyed by the card, so it resets automatically when the card changes.
   const [revealedKey, setRevealedKey] = useState<string | null>(null);
   const [typedAnswer, setTypedAnswer] = useState<{ key: string | null; value: string }>({
@@ -153,7 +164,7 @@ export function StudyScreen() {
           <button
             type="button"
             onClick={() =>
-              router.push(deckParam > 0 ? { pathname: "/deck", query: { deck: deckParam } } : "/")
+              router.push(deckId ? { pathname: "/deck", query: { deck: deckId } } : "/")
             }
             aria-label={t("finished")}
             className="flex size-8 items-center justify-center rounded-full bg-fill-3 text-label-2 active:opacity-50"
@@ -164,39 +175,45 @@ export function StudyScreen() {
             <span className="truncate text-subhead font-semibold">
               {session.deck?.name.split("::").pop()}
             </span>
-            <span
-              className="flex gap-2.5 text-footnote font-semibold tabular-nums"
-              aria-label={t("remaining", {
-                new: counts.new,
-                learning: counts.learning,
-                review: counts.review,
-              })}
-            >
-              <span
-                className={cn(
-                  "text-ios-blue",
-                  activeQueue === "new" && current && "underline underline-offset-4",
-                )}
-              >
-                {counts.new}
+            {session.mode === "practice" ? (
+              <span className="text-footnote font-semibold text-ios-indigo tabular-nums">
+                {t("practiceCount", { count: session.remaining })}
               </span>
+            ) : (
               <span
-                className={cn(
-                  "text-ios-red",
-                  activeQueue === "learning" && current && "underline underline-offset-4",
-                )}
+                className="flex gap-2.5 text-footnote font-semibold tabular-nums"
+                aria-label={t("remaining", {
+                  new: counts.new,
+                  learning: counts.learning,
+                  review: counts.review,
+                })}
               >
-                {counts.learning}
+                <span
+                  className={cn(
+                    "text-ios-blue",
+                    activeQueue === "new" && current && "underline underline-offset-4",
+                  )}
+                >
+                  {counts.new}
+                </span>
+                <span
+                  className={cn(
+                    "text-ios-red",
+                    activeQueue === "learning" && current && "underline underline-offset-4",
+                  )}
+                >
+                  {counts.learning}
+                </span>
+                <span
+                  className={cn(
+                    "text-ios-green",
+                    activeQueue === "review" && current && "underline underline-offset-4",
+                  )}
+                >
+                  {counts.review}
+                </span>
               </span>
-              <span
-                className={cn(
-                  "text-ios-green",
-                  activeQueue === "review" && current && "underline underline-offset-4",
-                )}
-              >
-                {counts.review}
-              </span>
-            </span>
+            )}
           </div>
           <button
             type="button"
@@ -221,9 +238,14 @@ export function StudyScreen() {
 
       <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col overflow-hidden px-3 pt-2">
         {session.status === "ready" && !current ? (
-          <Finished nextDue={session.nextLearningDue} format={format} deckId={deckParam} />
+          <Finished
+            nextDue={session.nextLearningDue}
+            format={format}
+            deckId={deckId}
+            practice={session.mode === "practice"}
+          />
         ) : session.status === "missing" ? (
-          <Finished nextDue={null} format={format} deckId={null} />
+          <Finished nextDue={null} format={format} deckId={null} practice={false} />
         ) : (
           <div className="relative flex-1 [perspective:1600px]">
             <AnimatePresence mode="popLayout" initial={false}>
@@ -263,7 +285,12 @@ export function StudyScreen() {
         <div className="pb-3">
           {current && scheduler ? (
             revealed ? (
-              <AnswerButtons card={current} scheduler={scheduler} onAnswer={answer} />
+              <AnswerButtons
+                card={current}
+                scheduler={scheduler}
+                onAnswer={answer}
+                labels={session.mode === "practice" ? PRACTICE_LABELS : undefined}
+              />
             ) : (
               <IosButton
                 size="lg"
@@ -310,18 +337,22 @@ function Finished({
   nextDue,
   format,
   deckId,
+  practice,
 }: {
   nextDue: Date | null;
   format: ReturnType<typeof useFormatter>;
   deckId: number | null;
+  practice: boolean;
 }) {
   const t = useTranslations("review");
   const decks = useTranslations("decks");
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-3 text-center">
       <PartyPopper className="size-14 text-ios-orange" strokeWidth={1.5} aria-hidden />
-      <h1 className="text-title-2 font-bold">{t("finished")}</h1>
-      <p className="max-w-xs text-label-2">{t("finishedHint")}</p>
+      <h1 className="text-title-2 font-bold">{practice ? t("practiceDone") : t("finished")}</h1>
+      <p className="max-w-xs text-label-2">
+        {practice ? t("practiceDoneHint") : t("finishedHint")}
+      </p>
       {nextDue ? (
         <p className="text-subhead text-label-2">
           {t("nextLearning", { time: format.relativeTime(nextDue, new Date()) })}

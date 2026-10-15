@@ -47,7 +47,14 @@
     "deleteTitle": "„{name}“ löschen?",
     "deleteMessage": "{cards, plural, =0 {Der Stapel ist leer.} one {# Karte wird samt Lernverlauf endgültig gelöscht.} other {# Karten werden samt Lernverlauf endgültig gelöscht.}} {subdecks, plural, =0 {} one {Das umfasst # Unterstapel.} other {Das umfasst # Unterstapel.}} Dies kann nicht rückgängig gemacht werden.",
     "deleteConfirm": "Löschen",
-    "subdecks": "Unterstapel"
+    "subdecks": "Unterstapel",
+    "customStudy": "Benutzerdefiniertes Lernen",
+    "customStudyFooter": "Übungssitzungen ändern weder Fälligkeiten noch Tageslimits oder Statistiken.",
+    "forgotten": "Vergessene Karten wiederholen",
+    "forgottenWithin": "{count, plural, one {Am letzten Tag vergessen} other {In den letzten # Tagen vergessen}}",
+    "fewerDays": "Weniger Tage",
+    "moreDays": "Mehr Tage",
+    "startPractice": "Übung starten"
   },
   "review": {
     "showAnswer": "Antwort zeigen",
@@ -65,7 +72,10 @@
     "suspend": "Karte aussetzen",
     "bury": "Karte zurückstellen",
     "moreActions": "Mehr",
-    "backToDeck": "Zurück zum Stapel"
+    "backToDeck": "Zurück zum Stapel",
+    "practiceCount": "Übung · {count}",
+    "practiceDone": "Übung abgeschlossen",
+    "practiceDoneHint": "Fälligkeiten und Statistik bleiben unverändert."
   },
   "browse": {
     "title": "Durchsuchen",

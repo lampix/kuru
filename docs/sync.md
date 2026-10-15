@@ -19,7 +19,7 @@ Reviewing never waits for the network. Every answer is computed on the device an
 | 2 | `GET /api/sync/meta` | decks, presets, note types, timezone, `server_time` |
 | 3 | `GET /api/sync/cards?since=&after_id=` | cards whose scheduling or note changed, keyset-paged |
 | 4 | `GET /api/sync/card-ids` | prune cards deleted on the server |
-| 5 | `GET /api/sync/reviews?since=` | reviews of the last two study days (daily limits from other devices) |
+| 5 | `GET /api/sync/reviews?since=` | reviews since the last sync (at least the previous study day, at most 30 days) — daily limits across devices and custom study offline; older local reviews are pruned |
 | 6 | `GET /api/sync/media` | manifest; new/changed files are downloaded into CacheStorage |
 
 `server_time` from step 2 becomes `since` for the next cycle. Cards that still have pending outbox

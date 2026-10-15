@@ -21,7 +21,7 @@ import {
 } from "./queue";
 import { type StudyDay, studyDay } from "./time";
 
-interface SessionData {
+export interface SessionData {
   deck: SyncDeck;
   decks: SyncDeck[];
   preset: Preset;
@@ -33,6 +33,8 @@ interface SessionData {
 }
 
 export interface StudySession {
+  /** "practice" sessions never change the real schedule (see `practice.ts`). */
+  mode: "regular" | "practice";
   status: "loading" | "missing" | "ready";
   deck: SyncDeck | null;
   preset: Preset | null;
@@ -42,6 +44,10 @@ export interface StudySession {
   noteType: (card: LocalCard) => NoteType | undefined;
   deckName: (card: LocalCard) => string;
   counts: QueueCounts;
+  /** Cards left in the session (practice: cards still to be finished). */
+  remaining: number;
+  /** Increases with every card presentation; keys per-card UI state (a card can return). */
+  showing: number;
   nextLearningDue: Date | null;
   canUndo: boolean;
   answer: (rating: Rating, durationMs: number) => Promise<void>;
@@ -52,7 +58,7 @@ export interface StudySession {
 
 const UNDO_DEPTH = 20;
 
-async function loadSession(deckId: number): Promise<SessionData | null> {
+export async function loadSession(deckId: number): Promise<SessionData | null> {
   const [decks, presets, noteTypes, reviews, tz, rollover] = await Promise.all([
     db.decks.toArray(),
     db.presets.toArray(),
@@ -203,7 +209,9 @@ export function useStudySession(deckId: number | null): StudySession {
     [data],
   );
 
+  const counts = derived?.counts ?? { new: 0, learning: 0, review: 0 };
   return {
+    mode: "regular",
     status:
       deckId === null || data === null
         ? "missing"
@@ -217,7 +225,9 @@ export function useStudySession(deckId: number | null): StudySession {
     next: derived?.following ?? null,
     noteType,
     deckName,
-    counts: derived?.counts ?? { new: 0, learning: 0, review: 0 },
+    counts,
+    remaining: counts.new + counts.learning + counts.review,
+    showing: history.length,
     nextLearningDue: derived?.pick.nextLearningDue ?? null,
     canUndo: history.length > 0,
     answer,

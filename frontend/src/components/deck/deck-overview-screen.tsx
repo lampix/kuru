@@ -11,6 +11,8 @@ import { useDeckTree } from "@/lib/db/hooks";
 import type { DeckNode } from "@/lib/study/deck-tree";
 import { cn } from "@/lib/utils";
 
+import { CustomStudy } from "./custom-study";
+
 function findNode(nodes: readonly DeckNode[], id: number): DeckNode | undefined {
   for (const node of nodes) {
     if (node.deck.id === id) return node;
@@ -83,6 +85,8 @@ export function DeckOverviewScreen() {
           <p className="text-title-3 font-semibold">{t("allDone")}</p>
         </div>
       )}
+
+      <CustomStudy deck={node.deck} />
 
       {node.children.length ? (
         <ListSection header={t("subdecks")}>

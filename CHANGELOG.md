@@ -6,6 +6,17 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- Deck overview: tapping a deck shows today's new / learning / review counts with a "Study" button
+  (or the "all done" celebration), sub-decks and deck options.
+- Custom study: **review forgotten cards** of the last 1–30 days as a practice session — Again and
+  Hard bring a card back in the session, Good and Easy finish it. Practice never changes due dates,
+  daily limits or statistics, and works offline.
+
+### Changed
+- The device keeps 30 days of review history (previously two study days) and fetches the whole gap
+  since the last sync.
+
 ### Fixed
 - The "Source Code" row in Settings is clickable across its full width (it opens in a new tab),
   like the other rows.

@@ -26,6 +26,29 @@ export function toLocalCard(card: StudyCard): LocalCard {
   };
 }
 
+const DAY_MS = 86_400_000;
+/** How long reviews are kept on the device (bounds "forgotten in the last N days"). */
+export const REVIEW_RETENTION_DAYS = 30;
+
+/**
+ * Which reviews to (re)fetch: everything since the last sync (minus a day, for reviews other
+ * devices uploaded late) and at least the previous study day, but never more than the retention
+ * window. Reviews older than `keepFrom` are dropped locally.
+ */
+export function reviewWindow(
+  now: Date,
+  dayStart: Date,
+  lastSync: string | null,
+): { since: Date; keepFrom: Date } {
+  const keepFrom = new Date(now.getTime() - REVIEW_RETENTION_DAYS * DAY_MS);
+  const yesterday = dayStart.getTime() - DAY_MS;
+  const fromLastSync = lastSync ? Date.parse(lastSync) - DAY_MS : keepFrom.getTime();
+  return {
+    since: new Date(Math.max(keepFrom.getTime(), Math.min(fromLastSync, yesterday))),
+    keepFrom,
+  };
+}
+
 export interface SyncReport {
   pushed: number;
   pulledCards: number;
@@ -69,12 +92,13 @@ export async function runSync(
   const stale = (await db.cards.toCollection().primaryKeys()).filter((id) => !existing.has(id));
   await db.cards.bulkDelete(stale);
 
-  // Reviews from the previous and current study day drive the daily limits.
-  const day = studyDay(new Date(), meta.timezone, meta.day_rollover_hour);
-  const since = new Date(day.start.getTime() - 24 * 3_600_000).toISOString();
-  const recent = await api.sync.reviews(since);
+  // Recent reviews drive the daily limits (today) and custom study (last 30 days, offline too).
+  const now = new Date();
+  const day = studyDay(now, meta.timezone, meta.day_rollover_hour);
+  const window = reviewWindow(now, day.start, lastSync);
+  const recent = await api.sync.reviews(window.since.toISOString());
   await db.transaction("rw", db.reviews, async () => {
-    await db.reviews.where("reviewed_at").below(since).delete();
+    await db.reviews.where("reviewed_at").below(window.keepFrom.toISOString()).delete();
     await db.reviews.bulkPut(recent);
   });
 

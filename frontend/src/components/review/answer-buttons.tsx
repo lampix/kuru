@@ -18,10 +18,13 @@ export function AnswerButtons({
   card,
   scheduler,
   onAnswer,
+  labels,
 }: {
   card: LocalCard;
   scheduler: Scheduler;
   onAnswer: (rating: Rating) => void;
+  /** Replaces the FSRS interval previews (practice sessions). */
+  labels?: Record<Rating, string>;
 }) {
   const t = useTranslations("review");
   const locale = useLocale();
@@ -43,7 +46,7 @@ export function AnswerButtons({
             )}
           >
             <span className="text-caption font-medium tabular-nums opacity-90">
-              {formatInterval(seconds, locale)}
+              {labels?.[rating] ?? formatInterval(seconds, locale)}
             </span>
             <span className="text-subhead font-semibold">{t(STYLE[rating].key)}</span>
           </button>
