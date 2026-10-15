@@ -9,6 +9,8 @@ All notable changes to this project are documented here. The format follows
 ### Fixed
 - Audio auto-play was sometimes cut off right away when the next card uses the same sound (e.g.
   the Hiragana and Katakana cards of one note): pre-buffering reset the playing audio.
+- Deck list: without sub-decks, deck names line up with other list rows instead of leaving room
+  for an invisible expand arrow.
 
 ## [0.4.0] - 2026-10-15
 

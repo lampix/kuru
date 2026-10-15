@@ -24,7 +24,11 @@ function Count({ value, className, label }: { value: number; className: string; 
   );
 }
 
-function DeckRow({ node, depth }: { node: DeckNode; depth: number }) {
+/**
+ * `nested`: some deck has sub-decks, so every row reserves the disclosure-chevron slot to keep the
+ * names aligned. A flat list drops the slot and lines up with other grouped-list rows.
+ */
+function DeckRow({ node, depth, nested }: { node: DeckNode; depth: number; nested: boolean }) {
   const t = useTranslations("decks");
   const [open, setOpen] = useState(depth === 0);
   const hasChildren = node.children.length > 0;
@@ -33,23 +37,25 @@ function DeckRow({ node, depth }: { node: DeckNode; depth: number }) {
       <div className="group/row flex items-stretch">
         <div
           className="flex min-h-12 flex-1 items-center gap-2 pr-3 hairline-b group-last/row:shadow-none"
-          style={{ paddingLeft: 8 + depth * 18 }}
+          style={{ paddingLeft: nested ? 8 + depth * 18 : 16 }}
         >
-          <button
-            type="button"
-            aria-label={node.shortName}
-            aria-expanded={hasChildren ? open : undefined}
-            onClick={() => setOpen(!open)}
-            className={cn(
-              "flex size-7 items-center justify-center text-label-3",
-              !hasChildren && "invisible",
-            )}
-          >
-            <ChevronRight
-              className={cn("size-4 transition-transform", open && "rotate-90")}
-              strokeWidth={3}
-            />
-          </button>
+          {nested && (
+            <button
+              type="button"
+              aria-label={node.shortName}
+              aria-expanded={hasChildren ? open : undefined}
+              onClick={() => setOpen(!open)}
+              className={cn(
+                "flex size-7 items-center justify-center text-label-3",
+                !hasChildren && "invisible",
+              )}
+            >
+              <ChevronRight
+                className={cn("size-4 transition-transform", open && "rotate-90")}
+                strokeWidth={3}
+              />
+            </button>
+          )}
           <Link
             href={{ pathname: "/deck", query: { deck: node.deck.id } }}
             className="flex min-w-0 flex-1 items-center gap-3 py-3 active:opacity-50"
@@ -72,7 +78,7 @@ function DeckRow({ node, depth }: { node: DeckNode; depth: number }) {
       </div>
       {open &&
         node.children.map((child) => (
-          <DeckRow key={child.deck.id} node={child} depth={depth + 1} />
+          <DeckRow key={child.deck.id} node={child} depth={depth + 1} nested />
         ))}
     </>
   );
@@ -103,7 +109,12 @@ export function DeckListScreen() {
       ) : (
         <div className="overflow-hidden rounded-[10px] bg-grouped-2">
           {tree.map((node) => (
-            <DeckRow key={node.deck.id} node={node} depth={0} />
+            <DeckRow
+              key={node.deck.id}
+              node={node}
+              depth={0}
+              nested={tree.some((n) => n.children.length > 0)}
+            />
           ))}
         </div>
       )}
