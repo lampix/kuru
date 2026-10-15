@@ -6,6 +6,10 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+- The "Source Code" row in Settings is clickable across its full width (it opens in a new tab),
+  like the other rows.
+
 ## [0.2.0] - 2026-10-14
 
 ### Added

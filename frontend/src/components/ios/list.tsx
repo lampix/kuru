@@ -48,6 +48,7 @@ interface ListRowProps {
   detail?: ReactNode;
   icon?: ReactNode;
   accessory?: ReactNode;
+  /** In-app path, or an absolute `http(s)://` URL that opens in a new tab. */
   href?: string;
   onClick?: () => void;
   chevron?: boolean;
@@ -113,6 +114,14 @@ export function ListRow({
     className,
   );
   if (href && !disabled) {
+    // Absolute URLs leave the app (new tab); everything else is an in-app, locale-aware link.
+    if (/^https?:\/\//.test(href)) {
+      return (
+        <a href={href} target="_blank" rel="noopener noreferrer" className={classes}>
+          {content}
+        </a>
+      );
+    }
     return (
       <Link href={href} className={classes}>
         {content}

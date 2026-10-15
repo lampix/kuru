@@ -38,12 +38,8 @@ export function SettingsScreen() {
         {SOURCE_URL ? (
           <ListRow
             icon={<RowIcon icon={Code} color="#24292f" />}
-            title={
-              <a href={SOURCE_URL} target="_blank" rel="noreferrer">
-                {t("sourceCode")}
-              </a>
-            }
-            chevron
+            title={t("sourceCode")}
+            href={SOURCE_URL}
           />
         ) : null}
       </ListSection>
