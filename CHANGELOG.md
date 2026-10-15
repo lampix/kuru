@@ -6,12 +6,19 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-15
+
 ### Added
 - Deck overview: tapping a deck shows today's new / learning / review counts with a "Study" button
   (or the "all done" celebration), sub-decks and deck options.
 - Custom study: **review forgotten cards** of the last 1–30 days as a practice session — Again and
   Hard bring a card back in the session, Good and Easy finish it. Practice never changes due dates,
   daily limits or statistics, and works offline.
+- Statistics: "Reviews per Day" switches between a calendar-year heat map (default), a calendar month
+  and the last 30 days; year and month can be stepped back to the first review
+  (`GET /api/stats/activity`).
+- Statistics: every stability and difficulty bar is labelled (stability in localized units, exact
+  ranges on tap) and both charts have an info button explaining what they show.
 
 ### Changed
 - The device keeps 30 days of review history (previously two study days) and fetches the whole gap
