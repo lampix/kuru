@@ -36,6 +36,26 @@ they do not use up the day's new/review limits and are kept out of the statistic
 - Study by card state or tag (cram)
 - Optional rescheduling mode for custom sessions
 
+## Card browser
+
+Searching, managing and — step by step — editing cards from the *Browse* tab.
+
+**First iteration: search & filters**
+- [ ] Filters behind a filter button (sheet), shown as removable chips: card status, deck (incl. sub-decks)
+      and card type (Anki's card template, e.g. *Hiragana* / *Katakana* of the same note).
+- [ ] Anki-style search terms: `deck:`, `card:`, `is:` and `tag:`.
+- [ ] Coloured status dot and card type on every row.
+- [ ] Select (filtered) cards and suspend / unsuspend them in bulk, also with Cmd/Ctrl+J.
+
+**Next**
+- **Edit cards** — edit the fields and tags of existing notes.
+- **Add new cards** — create notes using imported note types.
+
+**Later options**
+- Card actions while offline (queued like reviews)
+- More bulk actions: move to deck, bury, reset
+- Saved searches
+
 ## Later
 
 - **Multi-user accounts** — a real `AuthProvider` (sessions / OIDC) and user management; the schema
@@ -43,7 +63,6 @@ they do not use up the day's new/review limits and are kept out of the statistic
 - **`.apkg` export** — write collections back in Anki format; ids, guids, `usn`/`mod`, raw configs and
   the revlog are preserved for this.
 - **AnkiWeb / Anki sync protocol** — two-way sync using the stored metadata.
-- **Note editor** — create and edit notes using imported note types.
 - **Filtered decks** — saved, user-defined searches as decks (custom study sessions are planned above).
 - **Template JavaScript** — opt-in execution of deck scripts in a sandboxed iframe.
 - **Plugins** — JLAB Kanji replacement filters, Yomitan dictionary lookups ([plugins](plugins.md)).
