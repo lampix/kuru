@@ -105,7 +105,21 @@
     "selected": "Sélection : {count}",
     "select": "Sélectionner",
     "results": "{count, plural, one {# carte} other {# cartes}}",
-    "stateRelearning": "En réapprentissage"
+    "stateRelearning": "En réapprentissage",
+    "filters": "Filtres",
+    "resetFilters": "Réinitialiser",
+    "removeFilter": "Retirer le filtre {name}",
+    "status": "Statut",
+    "cardType": "Type de carte",
+    "allStatuses": "Tous les statuts",
+    "allCardTypes": "Tous les types",
+    "stateBuried": "Enfouies",
+    "searchHint": "Termes de recherche : deck:Nom, card:Nom, is:new, tag:Nom — mettez entre guillemets les valeurs avec espaces.",
+    "selectAll": "Tout sélectionner",
+    "deselectAll": "Tout désélectionner",
+    "suspendedToast": "{count, plural, one {# carte suspendue} other {# cartes suspendues}}",
+    "unsuspendedToast": "{count, plural, one {# carte réactivée} other {# cartes réactivées}}",
+    "offlineHint": "Une connexion est nécessaire pour suspendre des cartes."
   },
   "stats": {
     "title": "Statistiques",

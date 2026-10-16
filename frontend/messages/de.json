@@ -105,7 +105,21 @@
     "selected": "{count} ausgewählt",
     "select": "Auswählen",
     "results": "{count, plural, one {# Karte} other {# Karten}}",
-    "stateRelearning": "Wiederlernen"
+    "stateRelearning": "Wiederlernen",
+    "filters": "Filter",
+    "resetFilters": "Zurücksetzen",
+    "removeFilter": "Filter {name} entfernen",
+    "status": "Status",
+    "cardType": "Kartentyp",
+    "allStatuses": "Alle Status",
+    "allCardTypes": "Alle Kartentypen",
+    "stateBuried": "Zurückgestellt",
+    "searchHint": "Suchbegriffe: deck:Name, card:Name, is:new, tag:Name – Werte mit Leerzeichen in Anführungszeichen.",
+    "selectAll": "Alle auswählen",
+    "deselectAll": "Auswahl aufheben",
+    "suspendedToast": "{count, plural, one {# Karte ausgesetzt} other {# Karten ausgesetzt}}",
+    "unsuspendedToast": "{count, plural, one {# Karte fortgesetzt} other {# Karten fortgesetzt}}",
+    "offlineHint": "Zum Aussetzen von Karten ist eine Verbindung nötig."
   },
   "stats": {
     "title": "Statistik",

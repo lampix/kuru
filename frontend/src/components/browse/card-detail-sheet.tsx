@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { api } from "@/lib/api/client";
 import type { HistoryEntry } from "@/lib/api/types";
 import { AudioPlayer } from "@/lib/audio";
+import { templateName } from "@/lib/browse/filter";
 import { db } from "@/lib/db";
 import { CardState, Scheduler } from "@/lib/fsrs";
 import { renderCard } from "@/lib/render";
@@ -118,6 +119,7 @@ export function CardDetailSheet({
             <ListSection>
               <ListRow title={t("deck")} detail={data?.deck?.name.replaceAll("::", " › ")} />
               <ListRow title={t("noteType")} detail={data?.noteType?.name} />
+              <ListRow title={t("cardType")} detail={templateName(card, data?.noteType) || "–"} />
               <ListRow title={t("tags")} detail={card.tags.join(" ") || "–"} />
               <ListRow
                 title={t("due")}
