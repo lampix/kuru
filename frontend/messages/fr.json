@@ -119,7 +119,13 @@
     "deselectAll": "Tout désélectionner",
     "suspendedToast": "{count, plural, one {# carte suspendue} other {# cartes suspendues}}",
     "unsuspendedToast": "{count, plural, one {# carte réactivée} other {# cartes réactivées}}",
-    "offlineHint": "Une connexion est nécessaire pour suspendre des cartes."
+    "offlineHint": "Une connexion est nécessaire pour suspendre des cartes.",
+    "cardSide": "Face de la carte",
+    "front": "Recto",
+    "back": "Verso",
+    "fields": "Champs",
+    "cardSection": "Carte",
+    "statistics": "Statistiques"
   },
   "stats": {
     "title": "Statistiques",
@@ -175,7 +181,11 @@
     "sourceCode": "Code source",
     "logout": "Se déconnecter",
     "resetLocal": "Effacer les données hors ligne",
-    "resetLocalConfirm": "Supprimer toutes les données stockées sur cet appareil ? Les révisions non synchronisées seront perdues."
+    "resetLocalConfirm": "Supprimer toutes les données stockées sur cet appareil ? Les révisions non synchronisées seront perdues.",
+    "display": "Affichage",
+    "cardTextSize": "Taille du texte des cartes",
+    "cardTextSizeFooter": "S’applique aux cartes en révision et dans les infos de la carte. Sur téléphone, les cartes sont en plus affichées un peu plus petites.",
+    "cardTextSizeSample": "Texte d’exemple"
   },
   "import": {
     "title": "Importer",

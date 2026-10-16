@@ -119,7 +119,13 @@
     "deselectAll": "Deseleziona tutto",
     "suspendedToast": "{count, plural, one {# carta sospesa} other {# carte sospese}}",
     "unsuspendedToast": "{count, plural, one {# carta riattivata} other {# carte riattivate}}",
-    "offlineHint": "Per sospendere le carte serve una connessione."
+    "offlineHint": "Per sospendere le carte serve una connessione.",
+    "cardSide": "Lato della carta",
+    "front": "Fronte",
+    "back": "Retro",
+    "fields": "Campi",
+    "cardSection": "Carta",
+    "statistics": "Statistiche"
   },
   "stats": {
     "title": "Statistiche",
@@ -175,7 +181,11 @@
     "sourceCode": "Codice sorgente",
     "logout": "Esci",
     "resetLocal": "Cancella dati offline",
-    "resetLocalConfirm": "Rimuovere tutti i dati salvati su questo dispositivo? I ripassi non sincronizzati andranno persi."
+    "resetLocalConfirm": "Rimuovere tutti i dati salvati su questo dispositivo? I ripassi non sincronizzati andranno persi.",
+    "display": "Visualizzazione",
+    "cardTextSize": "Dimensione testo delle carte",
+    "cardTextSizeFooter": "Si applica alle carte in ripasso e nelle info della carta. Sui telefoni le carte sono inoltre mostrate un po’ più piccole.",
+    "cardTextSizeSample": "Testo di esempio"
   },
   "import": {
     "title": "Importa",

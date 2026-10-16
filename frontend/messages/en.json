@@ -119,7 +119,13 @@
     "deselectAll": "Deselect All",
     "suspendedToast": "{count, plural, one {# card suspended} other {# cards suspended}}",
     "unsuspendedToast": "{count, plural, one {# card unsuspended} other {# cards unsuspended}}",
-    "offlineHint": "Suspending cards needs a connection."
+    "offlineHint": "Suspending cards needs a connection.",
+    "cardSide": "Card side",
+    "front": "Front",
+    "back": "Back",
+    "fields": "Fields",
+    "cardSection": "Card",
+    "statistics": "Statistics"
   },
   "stats": {
     "title": "Statistics",
@@ -175,7 +181,11 @@
     "sourceCode": "Source Code",
     "logout": "Sign Out",
     "resetLocal": "Clear Offline Data",
-    "resetLocalConfirm": "Remove all data stored on this device? Unsynced reviews will be lost."
+    "resetLocalConfirm": "Remove all data stored on this device? Unsynced reviews will be lost.",
+    "display": "Display",
+    "cardTextSize": "Card Text Size",
+    "cardTextSizeFooter": "Applies to cards in review and card info. On phones, cards are additionally shown a little smaller.",
+    "cardTextSizeSample": "Sample text"
   },
   "import": {
     "title": "Import",

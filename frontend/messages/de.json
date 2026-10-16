@@ -119,7 +119,13 @@
     "deselectAll": "Auswahl aufheben",
     "suspendedToast": "{count, plural, one {# Karte ausgesetzt} other {# Karten ausgesetzt}}",
     "unsuspendedToast": "{count, plural, one {# Karte fortgesetzt} other {# Karten fortgesetzt}}",
-    "offlineHint": "Zum Aussetzen von Karten ist eine Verbindung nötig."
+    "offlineHint": "Zum Aussetzen von Karten ist eine Verbindung nötig.",
+    "cardSide": "Kartenseite",
+    "front": "Vorderseite",
+    "back": "Rückseite",
+    "fields": "Felder",
+    "cardSection": "Karte",
+    "statistics": "Statistik"
   },
   "stats": {
     "title": "Statistik",
@@ -175,7 +181,11 @@
     "sourceCode": "Quellcode",
     "logout": "Abmelden",
     "resetLocal": "Offline-Daten löschen",
-    "resetLocalConfirm": "Alle auf diesem Gerät gespeicherten Daten entfernen? Nicht synchronisierte Wiederholungen gehen verloren."
+    "resetLocalConfirm": "Alle auf diesem Gerät gespeicherten Daten entfernen? Nicht synchronisierte Wiederholungen gehen verloren.",
+    "display": "Darstellung",
+    "cardTextSize": "Textgröße der Karten",
+    "cardTextSizeFooter": "Gilt für Karten beim Lernen und in der Karteninfo. Auf Smartphones werden Karten zusätzlich etwas kleiner dargestellt.",
+    "cardTextSizeSample": "Beispieltext"
   },
   "import": {
     "title": "Import",

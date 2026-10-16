@@ -4,7 +4,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { useFormatter, useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 
-import { ConfirmDialog, ListRow, ListSection } from "@/components/ios";
+import { ConfirmDialog, ListRow, ListSection, SegmentedControl } from "@/components/ios";
 import { CardView } from "@/components/review/card-view";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { api } from "@/lib/api/client";
@@ -13,7 +13,7 @@ import { AudioPlayer } from "@/lib/audio";
 import { templateName } from "@/lib/browse/filter";
 import { db } from "@/lib/db";
 import { CardState, Scheduler } from "@/lib/fsrs";
-import { renderCard } from "@/lib/render";
+import { noteFields, renderCard, renderField } from "@/lib/render";
 import { presetForDeck } from "@/lib/study/deck-tree";
 import { applyMemory } from "@/lib/sync/outbox";
 
@@ -26,7 +26,7 @@ const RATING_COLOR = [
   "text-ios-green",
 ];
 
-/** Card info: preview, memory state, review history and actions. */
+/** Card info: preview of both sides, note fields, statistics, actions and review history. */
 export function CardDetailSheet({
   cardId,
   onClose,
@@ -42,6 +42,7 @@ export function CardDetailSheet({
     null,
   );
   const [confirmReset, setConfirmReset] = useState(false);
+  const [side, setSide] = useState<"question" | "answer">("answer");
   const audio = useMemo(() => new AudioPlayer(), []);
 
   // Stop playback when another card is shown, the sheet closes or the screen unmounts.
@@ -77,6 +78,16 @@ export function CardDetailSheet({
       data?.noteType ? renderCard(data.noteType, data.card, { deckName: data.deck?.name }) : null,
     [data],
   );
+  const fields = useMemo(
+    () =>
+      data?.noteType
+        ? noteFields(data.noteType, data.card).map((field) => ({
+            ...field,
+            html: field.value.trim() ? renderField(field.value, review("replayAudio")) : null,
+          }))
+        : [],
+    [data, review],
+  );
   const retrievability = useMemo(
     () => (data?.preset ? new Scheduler(data.preset).retrievability(data.card) : null),
     [data],
@@ -104,19 +115,50 @@ export function CardDetailSheet({
     <Sheet open={cardId !== null} onOpenChange={(open) => !open && onClose()}>
       <SheetContent
         side="bottom"
-        className="max-h-[92dvh] overflow-y-auto rounded-t-[14px] border-0 bg-grouped px-4 pb-[calc(env(safe-area-inset-bottom)+16px)]"
+        className="overflow-y-auto rounded-t-[14px] border-0 bg-grouped px-4 pb-[calc(env(safe-area-inset-bottom)+16px)] data-[side=bottom]:h-[94dvh]"
       >
         <SheetTitle className="pt-4 text-center text-headline">{t("cardInfo")}</SheetTitle>
         {card && rendered ? (
           <>
-            <div className="mt-3 max-h-64 shrink-0 overflow-y-auto rounded-[14px] bg-grouped-2">
+            <SegmentedControl
+              ariaLabel={t("cardSide")}
+              value={side}
+              onChange={setSide}
+              options={[
+                { value: "question", label: t("front") },
+                { value: "answer", label: t("back") },
+              ]}
+              className="mx-auto mt-3 w-full max-w-xs"
+            />
+            <div className="mt-3 shrink-0 overflow-hidden rounded-[14px] bg-grouped-2">
               <CardView
-                html={rendered.answer}
+                html={side === "question" ? rendered.question : rendered.answer}
                 css={rendered.css}
                 onPlaySound={(name) => void audio.play(name)}
               />
             </div>
-            <ListSection>
+
+            <ListSection header={t("fields")}>
+              {fields.map((field) => (
+                <div key={field.name} className="group/row">
+                  <div className="px-4 py-2.5 hairline-b group-last/row:shadow-none">
+                    <div className="text-footnote text-label-2">{field.name}</div>
+                    {field.html === null ? (
+                      <div className="text-label-3">–</div>
+                    ) : (
+                      <CardView
+                        html={field.html}
+                        css=""
+                        variant="field"
+                        onPlaySound={(name) => void audio.play(name)}
+                      />
+                    )}
+                  </div>
+                </div>
+              ))}
+            </ListSection>
+
+            <ListSection header={t("cardSection")}>
               <ListRow title={t("deck")} detail={data?.deck?.name.replaceAll("::", " › ")} />
               <ListRow title={t("noteType")} detail={data?.noteType?.name} />
               <ListRow title={t("cardType")} detail={templateName(card, data?.noteType) || "–"} />
@@ -129,6 +171,9 @@ export function CardDetailSheet({
                     : format.dateTime(new Date(card.due), { dateStyle: "medium" })
                 }
               />
+            </ListSection>
+
+            <ListSection header={t("statistics")}>
               <ListRow
                 title={t("stability")}
                 detail={card.stability === null ? "–" : `${number(card.stability)} d`}

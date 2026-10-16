@@ -119,7 +119,13 @@
     "deselectAll": "Deseleccionar todo",
     "suspendedToast": "{count, plural, one {# tarjeta suspendida} other {# tarjetas suspendidas}}",
     "unsuspendedToast": "{count, plural, one {# tarjeta reactivada} other {# tarjetas reactivadas}}",
-    "offlineHint": "Suspender tarjetas requiere conexión."
+    "offlineHint": "Suspender tarjetas requiere conexión.",
+    "cardSide": "Lado de la tarjeta",
+    "front": "Anverso",
+    "back": "Reverso",
+    "fields": "Campos",
+    "cardSection": "Tarjeta",
+    "statistics": "Estadísticas"
   },
   "stats": {
     "title": "Estadísticas",
@@ -175,7 +181,11 @@
     "sourceCode": "Código fuente",
     "logout": "Cerrar sesión",
     "resetLocal": "Borrar datos sin conexión",
-    "resetLocalConfirm": "¿Eliminar todos los datos guardados en este dispositivo? Los repasos no sincronizados se perderán."
+    "resetLocalConfirm": "¿Eliminar todos los datos guardados en este dispositivo? Los repasos no sincronizados se perderán.",
+    "display": "Visualización",
+    "cardTextSize": "Tamaño del texto de las tarjetas",
+    "cardTextSizeFooter": "Se aplica a las tarjetas en el repaso y en la información de la tarjeta. En móviles, las tarjetas se muestran además algo más pequeñas.",
+    "cardTextSizeSample": "Texto de ejemplo"
   },
   "import": {
     "title": "Importar",

@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 
 import { ListRow, ListSection, NavigationPage, RowIcon } from "@/components/ios";
 
+import { CardTextSizeSetting } from "./card-text-size-setting";
 import { LanguageSetting } from "./language-setting";
 import { SyncSettings } from "./sync-settings";
 
@@ -16,6 +17,7 @@ export function SettingsScreen() {
   return (
     <NavigationPage title={t("title")}>
       <LanguageSetting />
+      <CardTextSizeSetting />
       <ListSection header={t("collection")}>
         <ListRow
           href="/settings/import"

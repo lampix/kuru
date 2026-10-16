@@ -6,6 +6,17 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- Card info: switch the preview between front and back, and see every field of the note (rendered,
+  in note-type order) next to separate card and statistics groups. The sheet scrolls as a whole
+  instead of a small inner preview box.
+- Settings → Display: card text size (70–130 %), applied in review and card info.
+
+### Changed
+- Cards are shown smaller on phones (deck CSS is usually sized for desktop Anki).
+- Review on phones: the page scrolls with the header and answer buttons pinned, instead of a
+  framed card that scrolls inside itself. Wider screens keep the framed card.
+
 ### Fixed
 - Card browser filters: the deck filter comes first, followed by card type and status. Every
   option's count reflects the search and the other filters. The card-type list only offers types

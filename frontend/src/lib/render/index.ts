@@ -45,6 +45,21 @@ export interface RenderedCard {
   hasTypeAnswer: boolean;
 }
 
+/** The note's fields in note-type order, paired with the card's (positional) values. */
+export function noteFields(
+  noteType: Pick<NoteTypeLike, "fields">,
+  card: Pick<CardLike, "fields">,
+): Array<{ name: string; value: string }> {
+  return [...noteType.fields]
+    .sort((a, b) => a.ord - b.ord)
+    .map((field, index) => ({ name: field.name, value: card.fields[index] ?? "" }));
+}
+
+/** A single field value as safe HTML (sound tags become play buttons), for field lists. */
+export function renderField(value: string, playLabel = "Play"): string {
+  return sanitizeCardHtml(replaceSoundTags(value, playLabel));
+}
+
 const FRONT_MARKER = "\u0000kuru-frontside\u0000";
 
 function context(noteType: NoteTypeLike, card: CardLike, side: CardSide, deckName: string) {
@@ -53,9 +68,7 @@ function context(noteType: NoteTypeLike, card: CardLike, side: CardSide, deckNam
     ? noteType.templates[0]
     : noteType.templates.find((t) => t.ord === card.ord);
   const fields: Record<string, string> = {};
-  [...noteType.fields]
-    .sort((a, b) => a.ord - b.ord)
-    .forEach((field, index) => (fields[field.name] = card.fields[index] ?? ""));
+  for (const field of noteFields(noteType, card)) fields[field.name] = field.value;
   let ctx: RenderContext = {
     side,
     fields,

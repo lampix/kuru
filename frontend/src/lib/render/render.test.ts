@@ -4,10 +4,12 @@ import {
   type NoteTypeLike,
   clozeOrdinals,
   mediaUrl,
+  noteFields,
   parseTemplate,
   registerPlugin,
   renderCard,
   renderCloze,
+  renderField,
   renderTemplate,
   rewriteCssUrls,
 } from ".";
@@ -225,5 +227,27 @@ describe("clozeToPlain", () => {
   it("reveals all deletions", async () => {
     const { clozeToPlain } = await import("./cloze");
     expect(clozeToPlain("{{c1::Tokyo::city}} is in {{c2::Japan}}")).toBe("Tokyo is in Japan");
+  });
+});
+
+describe("field list", () => {
+  it("pairs field names in ord order with values, filling missing ones", () => {
+    const noteType = {
+      fields: [
+        { name: "Back", ord: 1 },
+        { name: "Front", ord: 0 },
+      ],
+    };
+    expect(noteFields(noteType, { fields: ["猫"] })).toEqual([
+      { name: "Front", value: "猫" },
+      { name: "Back", value: "" },
+    ]);
+  });
+
+  it("renders a field value safely with play buttons", () => {
+    const html = renderField("<b>neko</b>[sound:cat.mp3]<script>alert(1)</script>");
+    expect(html).toContain("<b>neko</b>");
+    expect(html).toContain('data-sound="cat.mp3"');
+    expect(html).not.toContain("script");
   });
 });
