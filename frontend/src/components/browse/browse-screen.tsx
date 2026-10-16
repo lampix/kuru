@@ -1,12 +1,14 @@
 "use client";
 
 import { useLiveQuery } from "dexie-react-hooks";
-import { ListFilter, Search, X } from "lucide-react";
+import { Circle, CircleCheck, ListFilter, Search, X } from "lucide-react";
 import { useFormatter, useTranslations } from "next-intl";
-import { type ReactNode, useDeferredValue, useMemo, useState } from "react";
+import { type ReactNode, useDeferredValue, useEffect, useMemo, useState } from "react";
 
-import { ListRow, NavigationPage } from "@/components/ios";
+import { BarButton, ListRow, NavigationPage, useToast } from "@/components/ios";
 import { useNow } from "@/hooks/use-now";
+import { useOnline } from "@/hooks/use-online";
+import { type SuspendAction, setSuspended, toggleAction } from "@/lib/browse/actions";
 import {
   type BrowseEntry,
   CARD_STATUSES,
@@ -56,14 +58,23 @@ function Chip({
 /** Searchable list of all cards — works offline on IndexedDB. */
 export function BrowseScreen() {
   const t = useTranslations("browse");
+  const common = useTranslations("common");
   const format = useFormatter();
   const [query, setQuery] = useState("");
   const [filters, setFilters] = useState<FilterState>(EMPTY_FILTERS);
   const [filterSheet, setFilterSheet] = useState(false);
   const [limit, setLimit] = useState(PAGE);
   const [selected, setSelected] = useState<number | null>(null);
+  const [selecting, setSelecting] = useState(false);
+  const [picked, setPicked] = useState<ReadonlySet<number>>(new Set());
+  // Cards just acted on stay listed until the search changes, like in Anki, so an action can be
+  // undone even when the cards no longer match (e.g. suspending under a "Review" filter).
+  const [kept, setKept] = useState<ReadonlySet<number>>(new Set());
+  const [busy, setBusy] = useState(false);
   const deferredQuery = useDeferredValue(query);
   const now = useNow(60_000);
+  const online = useOnline();
+  const { toast, show } = useToast({ aboveToolbar: selecting });
 
   const data = useLiveQuery(async () => {
     const [cards, decks, noteTypes] = await Promise.all([
@@ -101,7 +112,7 @@ export function BrowseScreen() {
 
   const results = useMemo(() => {
     if (!data || !now) return [];
-    return filterCards(
+    const matches = filterCards(
       data.entries,
       parseQuery(deferredQuery),
       {
@@ -111,12 +122,77 @@ export function BrowseScreen() {
       },
       now,
     );
-  }, [data, deferredQuery, filters, now]);
+    if (!kept.size) return matches;
+    const ids = new Set(matches.map((e) => e.card.id));
+    return data.entries.filter((e) => ids.has(e.card.id) || kept.has(e.card.id));
+  }, [data, deferredQuery, filters, now, kept]);
+
+  // Actions only ever apply to selected cards that are part of the current (filtered) results.
+  const selection = useMemo(
+    () => results.filter((e) => picked.has(e.card.id)).map((e) => e.card),
+    [results, picked],
+  );
 
   const updateFilters = (next: FilterState) => {
     setFilters(next);
     setLimit(PAGE);
+    setKept(new Set());
   };
+
+  const endSelecting = () => {
+    setSelecting(false);
+    setPicked(new Set());
+  };
+
+  const togglePicked = (id: number) =>
+    setPicked((current) => {
+      const next = new Set(current);
+      if (!next.delete(id)) next.add(id);
+      return next;
+    });
+
+  const run = async (action: SuspendAction, ids: number[]) => {
+    if (!ids.length || busy) return;
+    if (!navigator.onLine) {
+      show(t("offlineHint"), "error");
+      return;
+    }
+    setBusy(true);
+    try {
+      await setSuspended(ids, action);
+      setKept((current) => new Set([...current, ...ids]));
+      show(t(action === "suspend" ? "suspendedToast" : "unsuspendedToast", { count: ids.length }));
+    } catch (err) {
+      show(err instanceof Error ? err.message : String(err), "error");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  // Anki's shortcuts: Cmd/Ctrl+J toggles suspend, Cmd/Ctrl+A selects every filtered card.
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (!(event.metaKey || event.ctrlKey) || event.altKey || event.shiftKey) return;
+      const key = event.key.toLowerCase();
+      if (key === "j") {
+        const open =
+          selected === null ? undefined : data?.entries.find((e) => e.card.id === selected);
+        const cards = open ? [open.card] : selecting ? selection : [];
+        if (!cards.length) return;
+        event.preventDefault();
+        void run(
+          toggleAction(cards),
+          cards.map((c) => c.id),
+        );
+      } else if (key === "a" && selecting && selected === null) {
+        if (event.target instanceof HTMLInputElement) return;
+        event.preventDefault();
+        setPicked(new Set(results.map((e) => e.card.id)));
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
   const filterCount =
     filters.statuses.size + (filters.deckId === null ? 0 : 1) + filters.cardTypes.size;
   const deckName = data?.decks.find((d) => d.id === filters.deckId)?.name;
@@ -130,6 +206,15 @@ export function BrowseScreen() {
   return (
     <NavigationPage
       title={t("title")}
+      trailing={
+        selecting ? (
+          <BarButton bold onClick={endSelecting}>
+            {common("done")}
+          </BarButton>
+        ) : (
+          <BarButton onClick={() => setSelecting(true)}>{t("select")}</BarButton>
+        )
+      }
       accessory={
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
@@ -143,6 +228,7 @@ export function BrowseScreen() {
                 onChange={(e) => {
                   setQuery(e.target.value);
                   setLimit(PAGE);
+                  setKept(new Set());
                 }}
                 className="min-w-0 flex-1 bg-transparent outline-none placeholder:text-label-2"
               />
@@ -209,6 +295,7 @@ export function BrowseScreen() {
     >
       <div className="px-1 pb-2 text-footnote text-label-2">
         {t("results", { count: results.length })}
+        {selecting ? ` · ${t("selected", { count: selection.length })}` : null}
       </div>
 
       {data && now && results.length === 0 ? (
@@ -217,15 +304,29 @@ export function BrowseScreen() {
         <div className="overflow-hidden rounded-[10px] bg-grouped-2">
           {results.slice(0, limit).map(({ card, title, deckName, cardType }) => {
             const status = statusOf(card, now!);
+            const dot = <StatusDot status={status} label={t(STATUS_LABEL[status])} />;
             return (
               <ListRow
                 key={card.id}
-                icon={<StatusDot status={status} label={t(STATUS_LABEL[status])} />}
+                icon={
+                  selecting ? (
+                    <span className="flex items-center gap-3">
+                      {picked.has(card.id) ? (
+                        <CircleCheck className="size-[22px] fill-tint text-white" aria-hidden />
+                      ) : (
+                        <Circle className="size-[22px] text-label-3" aria-hidden />
+                      )}
+                      {dot}
+                    </span>
+                  ) : (
+                    dot
+                  )
+                }
                 title={title || "—"}
                 subtitle={[cardType, deckName.split("::").pop()].filter(Boolean).join(" · ")}
                 detail={<span className="text-footnote">{describe(card)}</span>}
-                onClick={() => setSelected(card.id)}
-                chevron
+                onClick={() => (selecting ? togglePicked(card.id) : setSelected(card.id))}
+                chevron={!selecting}
               />
             );
           })}
@@ -234,6 +335,58 @@ export function BrowseScreen() {
           ) : null}
         </div>
       )}
+
+      {selecting ? (
+        <>
+          {/* Keeps the last rows reachable above the toolbar. */}
+          <div className="h-16" aria-hidden />
+          <div
+            role="toolbar"
+            aria-label={t("selected", { count: selection.length })}
+            className="fixed inset-x-0 bottom-[calc(49px+env(safe-area-inset-bottom))] z-30 glass hairline-t"
+          >
+            {!online ? (
+              <p className="px-4 pt-2 text-center text-footnote text-label-2">{t("offlineHint")}</p>
+            ) : null}
+            <div className="mx-auto flex h-11 max-w-3xl items-center gap-1 px-2 text-subhead">
+              {selection.length === results.length && results.length > 0 ? (
+                <BarButton onClick={() => setPicked(new Set())}>{t("deselectAll")}</BarButton>
+              ) : (
+                <BarButton
+                  disabled={!results.length}
+                  onClick={() => setPicked(new Set(results.map((e) => e.card.id)))}
+                >
+                  {t("selectAll")}
+                </BarButton>
+              )}
+              <span className="flex-1" />
+              <BarButton
+                disabled={!online || busy || !selection.some((c) => !c.suspended)}
+                onClick={() =>
+                  void run(
+                    "suspend",
+                    selection.filter((c) => !c.suspended).map((c) => c.id),
+                  )
+                }
+              >
+                {t("suspend")}
+              </BarButton>
+              <BarButton
+                disabled={!online || busy || !selection.some((c) => c.suspended)}
+                onClick={() =>
+                  void run(
+                    "unsuspend",
+                    selection.filter((c) => c.suspended).map((c) => c.id),
+                  )
+                }
+              >
+                {t("unsuspend")}
+              </BarButton>
+            </div>
+          </div>
+        </>
+      ) : null}
+      {toast}
 
       <FilterSheet
         open={filterSheet}

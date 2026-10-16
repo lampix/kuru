@@ -19,9 +19,13 @@ const ERROR_VISIBLE_MS = 4000;
 
 /**
  * A transient confirmation pill (like iOS' "Saved" HUD), shown above the tab bar.
- * Returns the element to render and a `show` function.
+ * Returns the element to render and a `show` function. `aboveToolbar` lifts it over a screen's
+ * bottom toolbar.
  */
-export function useToast(): { toast: ReactNode; show: (text: string, tone?: ToastTone) => void } {
+export function useToast({ aboveToolbar = false }: { aboveToolbar?: boolean } = {}): {
+  toast: ReactNode;
+  show: (text: string, tone?: ToastTone) => void;
+} {
   const [message, setMessage] = useState<ToastMessage | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -45,7 +49,13 @@ export function useToast(): { toast: ReactNode; show: (text: string, tone?: Toas
     <div
       role="status"
       aria-live="polite"
-      className="pointer-events-none fixed inset-x-0 bottom-[calc(49px+env(safe-area-inset-bottom)+12px)] z-50 flex justify-center px-4"
+      className={cn(
+        "pointer-events-none fixed inset-x-0 z-50 flex justify-center px-4",
+        // A screen's own toolbar (44pt) can sit on top of the tab bar.
+        aboveToolbar
+          ? "bottom-[calc(49px+44px+env(safe-area-inset-bottom)+12px)]"
+          : "bottom-[calc(49px+env(safe-area-inset-bottom)+12px)]",
+      )}
     >
       <AnimatePresence>
         {message ? (

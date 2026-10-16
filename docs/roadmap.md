@@ -40,12 +40,12 @@ they do not use up the day's new/review limits and are kept out of the statistic
 
 Searching, managing and — step by step — editing cards from the *Browse* tab.
 
-**First iteration: search & filters**
-- [ ] Filters behind a filter button (sheet), shown as removable chips: card status, deck (incl. sub-decks)
+**First iteration: search & filters (done)**
+- [x] Filters behind a filter button (sheet), shown as removable chips: card status, deck (incl. sub-decks)
       and card type (Anki's card template, e.g. *Hiragana* / *Katakana* of the same note).
-- [ ] Anki-style search terms: `deck:`, `card:`, `is:` and `tag:`.
-- [ ] Coloured status dot and card type on every row.
-- [ ] Select (filtered) cards and suspend / unsuspend them in bulk, also with Cmd/Ctrl+J.
+- [x] Anki-style search terms: `deck:`, `card:`, `is:` and `tag:`.
+- [x] Coloured status dot and card type on every row.
+- [x] Select (filtered) cards and suspend / unsuspend them in bulk, also with Cmd/Ctrl+J.
 
 **Next**
 - **Edit cards** — edit the fields and tags of existing notes.

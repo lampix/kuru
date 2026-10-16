@@ -6,6 +6,19 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- Card browser: filters for card status, deck and card type (Anki's card template, e.g. *Hiragana*
+  and *Katakana* of the same note) behind a filter button; active filters show as removable chips.
+- Card browser: Anki-style search terms `deck:`, `card:` and `is:` (next to `tag:`), with quotes
+  for values with spaces and `*` wildcards.
+- Card browser: every row shows a coloured status dot and its card type; card info shows the card
+  type.
+- Card browser: select (filtered) cards and suspend or unsuspend them in bulk; Cmd/Ctrl+J toggles
+  suspend for the selection or the open card, Cmd/Ctrl+A selects all. Needs a connection.
+
+### Changed
+- Card browser: the status segmented control and deck picker moved into the filter sheet.
+
 ## [0.4.1] - 2026-10-15
 
 ### Fixed

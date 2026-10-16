@@ -32,7 +32,8 @@ Written in katakana, the name also echoes 来る (*"to come"*) — as in cards c
   bar, spring card flips, dark mode, safe areas.
 - **Anki-level deck options** — daily limits, new card order, (re)learning steps, desired retention,
   maximum interval, FSRS weights, sibling burying, audio autoplay, auto-reveal timer.
-- **Card browser & statistics** — offline full-text search, card info with review history, true
+- **Card browser & statistics** — offline search with Anki-style `deck:`/`card:`/`is:`/`tag:` terms,
+  status/deck/card-type filters, bulk (un)suspend (Cmd/Ctrl+J), card info with review history, true
   retention, forecast, stability/difficulty distributions.
 - **English & German** — follows your system language, overridable in Settings.
 - **Template rendering** — Anki template syntax incl. cloze, type-in answers, furigana, `[sound:]`;
