@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-16
+
 ### Added
 - Card browser: filters for card status, deck and card type (Anki's card template, e.g. *Hiragana*
   and *Katakana* of the same note) behind a filter button; active filters show as removable chips.
