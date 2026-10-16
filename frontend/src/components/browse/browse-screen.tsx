@@ -11,10 +11,10 @@ import { useOnline } from "@/hooks/use-online";
 import { type SuspendAction, setSuspended, toggleAction } from "@/lib/browse/actions";
 import {
   type BrowseEntry,
-  CARD_STATUSES,
-  type CardStatus,
-  cardTypeOptions,
+  type BrowseFilters,
+  cardTypesIn,
   deckSubtree,
+  facetCounts,
   filterCards,
   parseQuery,
   statusOf,
@@ -100,32 +100,35 @@ export function BrowseScreen() {
     return { entries, decks };
   }, []);
 
-  const cardTypes = useMemo(() => cardTypeOptions(data?.entries ?? []), [data]);
-  const statusCounts = useMemo(() => {
-    const counts = Object.fromEntries(CARD_STATUSES.map((s) => [s, 0])) as Record<
-      CardStatus,
-      number
-    >;
-    if (now) for (const { card } of data?.entries ?? []) counts[statusOf(card, now)] += 1;
-    return counts;
-  }, [data, now]);
+  const search = useMemo(() => {
+    const browseFilters: BrowseFilters = {
+      statuses: filters.statuses,
+      deckIds: deckSubtree(data?.decks ?? [], filters.deckId),
+      cardTypes: filters.cardTypes,
+    };
+    return { terms: parseQuery(deferredQuery), filters: browseFilters };
+  }, [data, deferredQuery, filters]);
+
+  // Option counts for the filter sheet.
+  const counts = useMemo(
+    () =>
+      facetCounts(
+        data?.entries ?? [],
+        search.terms,
+        search.filters,
+        data?.decks ?? [],
+        now ?? new Date(0),
+      ),
+    [data, now, search],
+  );
 
   const results = useMemo(() => {
     if (!data || !now) return [];
-    const matches = filterCards(
-      data.entries,
-      parseQuery(deferredQuery),
-      {
-        statuses: filters.statuses,
-        deckIds: deckSubtree(data.decks, filters.deckId),
-        cardTypes: filters.cardTypes,
-      },
-      now,
-    );
+    const matches = filterCards(data.entries, search.terms, search.filters, now);
     if (!kept.size) return matches;
     const ids = new Set(matches.map((e) => e.card.id));
     return data.entries.filter((e) => ids.has(e.card.id) || kept.has(e.card.id));
-  }, [data, deferredQuery, filters, now, kept]);
+  }, [data, search, now, kept]);
 
   // Actions only ever apply to selected cards that are part of the current (filtered) results.
   const selection = useMemo(
@@ -134,6 +137,11 @@ export function BrowseScreen() {
   );
 
   const updateFilters = (next: FilterState) => {
+    // A new deck drops selected card types it does not contain.
+    if (data && next.deckId !== filters.deckId && next.cardTypes.size) {
+      const available = cardTypesIn(data.entries, deckSubtree(data.decks, next.deckId));
+      next = { ...next, cardTypes: new Set([...next.cardTypes].filter((n) => available.has(n))) };
+    }
     setFilters(next);
     setLimit(PAGE);
     setKept(new Set());
@@ -394,8 +402,7 @@ export function BrowseScreen() {
         value={filters}
         onChange={updateFilters}
         decks={data?.decks ?? []}
-        cardTypes={cardTypes}
-        statusCounts={statusCounts}
+        counts={counts}
       />
       <CardDetailSheet cardId={selected} onClose={() => setSelected(null)} />
     </NavigationPage>

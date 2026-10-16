@@ -174,17 +174,90 @@ export interface CardTypeOption {
   noteTypes: string[];
 }
 
-/** The card types present among `entries`, sorted by name. */
-export function cardTypeOptions(entries: readonly BrowseEntry[]): CardTypeOption[] {
-  const options = new Map<string, { count: number; noteTypes: Set<string> }>();
-  for (const { cardType, noteTypeName } of entries) {
-    if (!cardType) continue;
-    const option = options.get(cardType) ?? { count: 0, noteTypes: new Set() };
-    option.count += 1;
-    option.noteTypes.add(noteTypeName);
-    options.set(cardType, option);
+/** How many cards each filter option would show, given the search and the *other* filters. */
+export interface FacetCounts {
+  statuses: Record<CardStatus, number>;
+  /** Per deck, including its sub-decks. */
+  decks: Map<number, number>;
+  /** Only card types that occur under the other filters (plus selected ones), sorted by name. */
+  cardTypes: CardTypeOption[];
+  /** Counts of the "all" rows: every status / deck / card type. */
+  any: { statuses: number; decks: number; cardTypes: number };
+}
+
+/**
+ * Faceted counts: each filter's options are counted with the search and every other filter
+ * applied, so picking a deck narrows the card types and status counts shown, and vice versa.
+ */
+export function facetCounts(
+  entries: readonly BrowseEntry[],
+  terms: readonly SearchTerm[],
+  filters: BrowseFilters,
+  decks: ReadonlyArray<{ id: number; name: string }>,
+  now: Date,
+): FacetCounts {
+  // A card counts towards its deck and every parent deck.
+  const idByName = new Map(decks.map((d) => [d.name, d.id]));
+  const lineage = new Map(
+    decks.map((d) => {
+      const parts = d.name.split("::");
+      const ids = parts.map((_, i) => idByName.get(parts.slice(0, i + 1).join("::")));
+      return [d.id, ids.filter((id) => id !== undefined)];
+    }),
+  );
+
+  const statuses = Object.fromEntries(CARD_STATUSES.map((s) => [s, 0])) as Record<
+    CardStatus,
+    number
+  >;
+  const deckCounts = new Map<number, number>();
+  const types = new Map<string, { count: number; noteTypes: Set<string> }>();
+  const any = { statuses: 0, decks: 0, cardTypes: 0 };
+
+  for (const entry of entries) {
+    if (!terms.every((term) => matchesTerm(entry, term, now))) continue;
+    const status = statusOf(entry.card, now);
+    const inDeck = !filters.deckIds || filters.deckIds.has(entry.card.deck_id);
+    const inType = !filters.cardTypes.size || filters.cardTypes.has(entry.cardType);
+    const inStatus = !filters.statuses.size || filters.statuses.has(status);
+
+    if (inDeck && inType) {
+      statuses[status] += 1;
+      any.statuses += 1;
+    }
+    if (inType && inStatus) {
+      any.decks += 1;
+      for (const id of lineage.get(entry.card.deck_id) ?? []) {
+        deckCounts.set(id, (deckCounts.get(id) ?? 0) + 1);
+      }
+    }
+    if (inDeck && inStatus) {
+      any.cardTypes += 1;
+      if (entry.cardType) {
+        const option = types.get(entry.cardType) ?? { count: 0, noteTypes: new Set() };
+        option.count += 1;
+        option.noteTypes.add(entry.noteTypeName);
+        types.set(entry.cardType, option);
+      }
+    }
   }
-  return [...options]
+  // Keep selected card types listed (with 0) so they can still be deselected.
+  for (const name of filters.cardTypes) {
+    if (!types.has(name)) types.set(name, { count: 0, noteTypes: new Set() });
+  }
+
+  const cardTypes = [...types]
     .map(([name, { count, noteTypes }]) => ({ name, count, noteTypes: [...noteTypes].sort() }))
     .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+  return { statuses, decks: deckCounts, cardTypes, any };
+}
+
+/** The card types occurring in the given decks (`null`: every deck). */
+export function cardTypesIn(
+  entries: readonly BrowseEntry[],
+  deckIds: ReadonlySet<number> | null,
+): Set<string> {
+  return new Set(
+    entries.filter((e) => !deckIds || deckIds.has(e.card.deck_id)).map((e) => e.cardType),
+  );
 }

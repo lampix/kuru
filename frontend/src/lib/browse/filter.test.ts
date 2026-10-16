@@ -6,7 +6,9 @@ import { CardState } from "@/lib/fsrs";
 import {
   type BrowseEntry,
   NO_FILTERS,
-  cardTypeOptions,
+  type BrowseFilters,
+  cardTypesIn,
+  facetCounts,
   deckSubtree,
   filterCards,
   parseQuery,
@@ -144,17 +146,63 @@ describe("filterCards", () => {
   });
 });
 
-describe("cardTypeOptions", () => {
-  const search = (q: string) => ids(filterCards(entries, parseQuery(q), NO_FILTERS, now));
+describe("facetCounts", () => {
+  // Card 5: a cloze card in the Kanji deck, so card types differ between decks.
+  const all = [...entries, entry(card({ id: 5, ord: 0, deck_id: 3 }), cloze, "Cloze")];
+  const facets = (filters: Partial<BrowseFilters>, q = "") =>
+    facetCounts(all, parseQuery(q), { ...NO_FILTERS, ...filters }, decks, now);
 
-  it("counts card types and lists their note types", () => {
-    const withCloze = [...entries, entry(card({ id: 5, ord: 0 }), cloze, "Cloze")];
-    expect(search("card:cloze")).toEqual([]);
-    expect(ids(filterCards(withCloze, parseQuery("card:cloze"), NO_FILTERS, now))).toEqual([5]);
-    expect(cardTypeOptions(withCloze)).toEqual([
+  it("matches card:Cloze to every cloze card", () => {
+    expect(ids(filterCards(all, parseQuery("card:cloze"), NO_FILTERS, now))).toEqual([5]);
+  });
+
+  it("counts decks with their sub-decks", () => {
+    const { decks: counts, any } = facets({});
+    expect(Object.fromEntries(counts)).toEqual({ 1: 3, 2: 1, 3: 2 });
+    expect(any.decks).toBe(5);
+  });
+
+  it("only offers the card types of the selected deck", () => {
+    const { cardTypes, any } = facets({ deckIds: deckSubtree(decks, 3) });
+    expect(cardTypes).toEqual([
       { name: "Cloze 1", count: 1, noteTypes: ["Cloze"] },
-      { name: "Hiragana", count: 2, noteTypes: ["Kana"] },
-      { name: "Katakana", count: 2, noteTypes: ["Kana"] },
+      { name: "Katakana", count: 1, noteTypes: ["Kana"] },
     ]);
+    expect(any.cardTypes).toBe(2);
+  });
+
+  it("counts each filter with the search and the other filters applied", () => {
+    const {
+      statuses,
+      decks: counts,
+      cardTypes,
+    } = facets({
+      deckIds: deckSubtree(decks, 1),
+      statuses: new Set(["review"]),
+      cardTypes: new Set(["Hiragana"]),
+    });
+    // Statuses ignore the status filter itself, but respect deck and card type.
+    expect(statuses).toMatchObject({ review: 1, suspended: 1, new: 0, learning: 0 });
+    // Decks ignore the deck filter: only card 1 is a Hiragana review card.
+    expect(Object.fromEntries(counts)).toEqual({ 1: 1 });
+    // Card types ignore the card-type filter: deck 1's only review card is Hiragana.
+    expect(cardTypes.map((c) => [c.name, c.count])).toEqual([["Hiragana", 1]]);
+    expect(facets({}, "is:new").statuses.new).toBe(1);
+  });
+
+  it("keeps selected card types listed when nothing matches", () => {
+    const { cardTypes } = facets({
+      deckIds: deckSubtree(decks, 3),
+      cardTypes: new Set(["Hiragana"]),
+    });
+    expect(cardTypes.map((c) => [c.name, c.count])).toEqual([
+      ["Cloze 1", 1],
+      ["Hiragana", 0],
+      ["Katakana", 1],
+    ]);
+  });
+
+  it("lists the card types of a deck", () => {
+    expect(cardTypesIn(all, deckSubtree(decks, 3))).toEqual(new Set(["Katakana", "Cloze 1"]));
   });
 });

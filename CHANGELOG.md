@@ -6,6 +6,12 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+- Card browser filters: the deck filter comes first, followed by card type and status. Every
+  option's count reflects the search and the other filters. The card-type list only offers types
+  found in the selected deck, and switching decks drops selected card types the new deck doesn't
+  have.
+
 ## [0.5.0] - 2026-10-16
 
 ### Added
