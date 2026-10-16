@@ -56,6 +56,26 @@ Searching, managing and — step by step — editing cards from the *Browse* tab
 - More bulk actions: move to deck, bury, reset
 - Saved searches
 
+## Client API (for third-party apps)
+
+Make the backend ready for clients other than the bundled PWA — native iOS/Android apps, desktop
+tools, scripts — so someone can start building one without reading the frontend code. Kuru itself
+will not ship native apps.
+
+- **Reachable API docs** — serve Swagger UI / ReDoc / `openapi.json` under `/api` (today they are
+  only on the backend port, which deployments don't expose); attach `openapi.json` to each release.
+- **API versioning** — `/api/v1/…` with a documented compatibility policy, plus a discovery endpoint
+  (server and API version, auth methods, capabilities) a client calls first.
+- **Device tokens** — the single user creates, names and revokes per-device API tokens in Settings
+  (stored hashed, last-used time shown), optionally paired via QR code. Replaces handing out the
+  master `KURU_ACCESS_TOKEN`. Tokens belong to a `user_id`, so they carry over to multi-user.
+- **Client guide** (`docs/clients.md`) — connecting and authenticating, the sync protocol step by
+  step, scheduling locally with an FSRS library and checking it against `shared/test-vectors`,
+  rendering note templates (in a WebView), media download, error format.
+
+User management is *not* a prerequisite: device tokens are enough for a single-user server. Accounts
+come with **Multi-user accounts** below and reuse the same tokens.
+
 ## Later
 
 - **Multi-user accounts** — a real `AuthProvider` (sessions / OIDC) and user management; the schema

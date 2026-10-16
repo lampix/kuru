@@ -1,7 +1,9 @@
 # HTTP API
 
 The backend serves interactive OpenAPI documentation at `/docs` (Swagger UI) and `/redoc`; the
-schema is at `/openapi.json`. All endpoints are under `/api` and exchange JSON with timezone-aware
+schema is at `/openapi.json`. These live on the backend itself (e.g. `http://localhost:8000/docs` in
+development); the frontend only proxies `/api/*`, so they are not reachable through the app's public
+URL yet (see [roadmap](roadmap.md#client-api-for-third-party-apps)). All endpoints are under `/api` and exchange JSON with timezone-aware
 ISO 8601 timestamps.
 
 ## Authentication
