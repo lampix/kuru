@@ -179,6 +179,9 @@
     @apply font-sans;
     -webkit-text-size-adjust: 100%;
     -webkit-tap-highlight-color: transparent;
+    /* The page scroller is the viewport, which takes this from <html>, not <body>: without it,
+       macOS elastic scrolling bounces the whole page, fixed tab bar included. */
+    overscroll-behavior-y: none;
   }
   body {
     @apply bg-grouped text-body text-label antialiased;

@@ -16,6 +16,8 @@ All notable changes to this project are documented here. The format follows
 - Cards are shown smaller on phones (deck CSS is usually sized for desktop Anki).
 
 ### Fixed
+- Desktop browsers on macOS no longer bounce the whole page (fixed tab bar included) when scrolling
+  past the top or bottom.
 - Card browser filters: the deck filter comes first, followed by card type and status. Every
   option's count reflects the search and the other filters. The card-type list only offers types
   found in the selected deck, and switching decks drops selected card types the new deck doesn't
