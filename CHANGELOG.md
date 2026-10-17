@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-10-17
+
 ### Added
 - Card info: every field of the note (rendered, in note-type order) next to separate card and
   statistics groups; an optional preview of the front or back. The sheet scrolls as a whole

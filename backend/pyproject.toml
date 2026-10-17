@@ -1,6 +1,6 @@
 [project]
 name = "kuru"
-version = "0.5.0"
+version = "0.5.1"
 description = "Kuru backend — FastAPI service for an Anki-compatible, FSRS-powered spaced repetition PWA."
 readme = "README.md"
 license = "MIT"
