@@ -89,6 +89,9 @@ export function CustomStudy({ deck }: { deck: SyncDeck }) {
               query: { deck: deck.id, custom: "forgotten", days },
             }}
             aria-disabled={!count}
+            // Close the sheet: with cacheComponents the overview keeps its state while hidden,
+            // so returning from the session would otherwise show the sheet again.
+            onClick={() => setOpen(false)}
             className={cn(
               iosButton({ variant: "filled", size: "lg" }),
               "h-[54px]",

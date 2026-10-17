@@ -16,6 +16,8 @@ All notable changes to this project are documented here. The format follows
 - Cards are shown smaller on phones (deck CSS is usually sized for desktop Anki).
 
 ### Fixed
+- Leaving a "Vergessene Karten wiederholen" practice session returns to the deck overview instead
+  of reopening the practice sheet.
 - Desktop browsers on macOS no longer bounce the whole page (fixed tab bar included) when scrolling
   past the top or bottom.
 - Card browser filters: the deck filter comes first, followed by card type and status. Every
