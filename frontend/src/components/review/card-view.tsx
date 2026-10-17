@@ -13,7 +13,7 @@ import { useCardScale } from "@/lib/preferences/card-scale";
  */
 const BASE_CSS = `
 :host { display: block; color: var(--ios-label); --kuru-auto: 1; }
-@media (max-width: 640px) { :host { --kuru-auto: 0.8; } }
+@media (max-width: 640px) { :host { --kuru-auto: 0.75; } }
 .kuru-scale { zoom: calc(var(--kuru-auto) * var(--kuru-user, 1)); min-height: 100%; }
 .card { font-size: 20px; line-height: 1.45; text-align: center; overflow-wrap: anywhere;
   background-color: transparent !important; padding: 24px 20px; min-height: 100%; box-sizing: border-box; }

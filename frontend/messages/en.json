@@ -120,12 +120,13 @@
     "suspendedToast": "{count, plural, one {# card suspended} other {# cards suspended}}",
     "unsuspendedToast": "{count, plural, one {# card unsuspended} other {# cards unsuspended}}",
     "offlineHint": "Suspending cards needs a connection.",
-    "cardSide": "Card side",
     "front": "Front",
     "back": "Back",
     "fields": "Fields",
     "cardSection": "Card",
-    "statistics": "Statistics"
+    "statistics": "Statistics",
+    "preview": "Preview",
+    "previewOff": "Off"
   },
   "stats": {
     "title": "Statistics",

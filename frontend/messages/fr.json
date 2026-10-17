@@ -120,12 +120,13 @@
     "suspendedToast": "{count, plural, one {# carte suspendue} other {# cartes suspendues}}",
     "unsuspendedToast": "{count, plural, one {# carte réactivée} other {# cartes réactivées}}",
     "offlineHint": "Une connexion est nécessaire pour suspendre des cartes.",
-    "cardSide": "Face de la carte",
     "front": "Recto",
     "back": "Verso",
     "fields": "Champs",
     "cardSection": "Carte",
-    "statistics": "Statistiques"
+    "statistics": "Statistiques",
+    "preview": "Aperçu",
+    "previewOff": "Masqué"
   },
   "stats": {
     "title": "Statistiques",

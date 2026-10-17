@@ -120,12 +120,13 @@
     "suspendedToast": "{count, plural, one {# Karte ausgesetzt} other {# Karten ausgesetzt}}",
     "unsuspendedToast": "{count, plural, one {# Karte fortgesetzt} other {# Karten fortgesetzt}}",
     "offlineHint": "Zum Aussetzen von Karten ist eine Verbindung nötig.",
-    "cardSide": "Kartenseite",
     "front": "Vorderseite",
     "back": "Rückseite",
     "fields": "Felder",
     "cardSection": "Karte",
-    "statistics": "Statistik"
+    "statistics": "Statistik",
+    "preview": "Vorschau",
+    "previewOff": "Aus"
   },
   "stats": {
     "title": "Statistik",

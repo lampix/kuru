@@ -76,11 +76,6 @@ export function StudyScreen() {
     if (cardKey) shownAt.current = performance.now();
   }, [cardKey]);
 
-  // On phones the page itself scrolls: start each card and each side at the top.
-  useEffect(() => {
-    window.scrollTo({ top: 0 });
-  }, [cardKey, revealed]);
-
   useEffect(() => {
     if (!rendered || revealed) return;
     if (preset?.autoplay_audio) void audio.playSequence(rendered.questionSounds);
@@ -165,10 +160,8 @@ export function StudyScreen() {
         : "learning";
 
   return (
-    // Phones: the page scrolls and header/answer buttons stay pinned. Wider screens: a fixed-height
-    // layout with a framed card that scrolls by itself.
-    <div className="flex min-h-dvh flex-col bg-grouped sm:h-dvh">
-      <header className="sticky top-0 z-10 bg-grouped pt-safe">
+    <div className="flex h-dvh flex-col bg-grouped">
+      <header className="pt-safe">
         <div className="mx-auto flex h-12 max-w-2xl items-center gap-2 px-3">
           <button
             type="button"
@@ -253,7 +246,7 @@ export function StudyScreen() {
         </div>
       </header>
 
-      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col sm:overflow-hidden sm:px-3 sm:pt-2">
+      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col overflow-hidden px-3 pt-2">
         {session.status === "ready" && !current ? (
           <Finished
             nextDue={session.nextLearningDue}
@@ -264,7 +257,7 @@ export function StudyScreen() {
         ) : session.status === "missing" ? (
           <Finished nextDue={null} format={format} deckId={null} practice={false} />
         ) : (
-          <div className="relative flex flex-1 flex-col [perspective:1600px]">
+          <div className="relative flex-1 [perspective:1600px]">
             <AnimatePresence mode="popLayout" initial={false}>
               {rendered ? (
                 <motion.div
@@ -277,7 +270,7 @@ export function StudyScreen() {
                   animate={{ rotateY: 0, opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, transition: { duration: 0.08 } }}
                   transition={{ type: "spring", stiffness: 260, damping: 26 }}
-                  className="flex-1 bg-grouped-2 [backface-visibility:hidden] sm:absolute sm:inset-0 sm:overflow-y-auto sm:rounded-[22px] sm:shadow-[0_1px_3px_rgb(0_0_0/0.06),0_8px_24px_rgb(0_0_0/0.06)]"
+                  className="absolute inset-0 overflow-y-auto rounded-[22px] bg-grouped-2 shadow-[0_1px_3px_rgb(0_0_0/0.06),0_8px_24px_rgb(0_0_0/0.06)] [backface-visibility:hidden]"
                   onClick={(event) => {
                     if (!revealed && !(event.target as HTMLElement).closest?.("input,button"))
                       reveal();
@@ -298,7 +291,7 @@ export function StudyScreen() {
         )}
       </main>
 
-      <footer className="sticky bottom-0 z-10 mx-auto w-full max-w-2xl bg-grouped px-3 pt-3 pb-safe">
+      <footer className="mx-auto w-full max-w-2xl px-3 pt-3 pb-safe">
         <div className="pb-3">
           {current && scheduler ? (
             revealed ? (

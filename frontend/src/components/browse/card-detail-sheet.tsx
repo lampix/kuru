@@ -42,7 +42,8 @@ export function CardDetailSheet({
     null,
   );
   const [confirmReset, setConfirmReset] = useState(false);
-  const [side, setSide] = useState<"question" | "answer">("answer");
+  // The preview is opt-in: the field list already shows the note's content and takes less space.
+  const [side, setSide] = useState<"hidden" | "question" | "answer">("hidden");
   const audio = useMemo(() => new AudioPlayer(), []);
 
   // Stop playback when another card is shown, the sheet closes or the screen unmounts.
@@ -120,23 +121,28 @@ export function CardDetailSheet({
         <SheetTitle className="pt-4 text-center text-headline">{t("cardInfo")}</SheetTitle>
         {card && rendered ? (
           <>
-            <SegmentedControl
-              ariaLabel={t("cardSide")}
-              value={side}
-              onChange={setSide}
-              options={[
-                { value: "question", label: t("front") },
-                { value: "answer", label: t("back") },
-              ]}
-              className="mx-auto mt-3 w-full max-w-xs"
-            />
-            <div className="mt-3 shrink-0 overflow-hidden rounded-[14px] bg-grouped-2">
-              <CardView
-                html={side === "question" ? rendered.question : rendered.answer}
-                css={rendered.css}
-                onPlaySound={(name) => void audio.play(name)}
-              />
-            </div>
+            <ListSection header={t("preview")}>
+              <div className="p-2">
+                <SegmentedControl
+                  ariaLabel={t("preview")}
+                  value={side}
+                  onChange={setSide}
+                  options={[
+                    { value: "hidden", label: t("previewOff") },
+                    { value: "question", label: t("front") },
+                    { value: "answer", label: t("back") },
+                  ]}
+                />
+              </div>
+              {side !== "hidden" ? (
+                <CardView
+                  html={side === "question" ? rendered.question : rendered.answer}
+                  css={rendered.css}
+                  onPlaySound={(name) => void audio.play(name)}
+                  className="hairline-t"
+                />
+              ) : null}
+            </ListSection>
 
             <ListSection header={t("fields")}>
               {fields.map((field) => (
